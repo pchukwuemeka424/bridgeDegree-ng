@@ -64,6 +64,29 @@ header { position: sticky; top: 0; z-index: 100; background: var(--surface); bor
 .nav-main a.active::after { content: ''; position: absolute; left: 14px; right: 14px; bottom: 0; height: 3px; background: var(--accent-green); border-radius: 3px 3px 0 0; }
 .nav-main a.active::before { content: ''; position: absolute; left: 0; bottom: 0; top: 0; width: 3px; background: var(--accent-green); border-radius: 0 3px 3px 0; }
 
+/* Mobile menu */
+.menu-toggle { display: none; flex-direction: column; justify-content: center; gap: 6px; width: 44px; height: 44px; padding: 10px; background: none; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+.menu-toggle:hover { background: var(--surface-2); border-color: var(--accent-green); }
+.menu-toggle-bar { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 1px; transition: transform 0.25s, opacity 0.25s; }
+.site-header.menu-open .menu-toggle-bar:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.site-header.menu-open .menu-toggle-bar:nth-child(2) { opacity: 0; }
+.site-header.menu-open .menu-toggle-bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+@media (max-width: 900px) {
+  .menu-toggle { display: flex; }
+  .nav-main { position: absolute; top: 100%; left: 0; right: 0; background: var(--surface); border-bottom: 1px solid var(--border); box-shadow: 0 8px 24px rgba(0,0,0,0.1); max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.3s ease, opacity 0.2s; }
+  .site-header.menu-open .nav-main { max-height: 360px; opacity: 1; }
+  .nav-main ul { flex-direction: column; padding: 16px 32px 24px; gap: 0; }
+  .nav-main li { width: 100%; }
+  .nav-main a { padding: 14px 0; font-size: 1rem; border-bottom: 1px solid var(--border); }
+  .nav-main li:last-child a { border-bottom: none; }
+  .nav-main a.active::after, .nav-main a.active::before { display: none; }
+  .nav-main a.active { border-left: 3px solid var(--accent-green); padding-left: 12px; }
+  header .header-inner { position: relative; }
+}
+@media (min-width: 901px) {
+  .nav-main { max-height: none !important; opacity: 1 !important; }
+}
+
 /* Footer */
 .site-footer { border-top: 3px solid var(--accent-green); }
 .footer-main { background: var(--header-dark); color: rgba(255,255,255,0.92); }

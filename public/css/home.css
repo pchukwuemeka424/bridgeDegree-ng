@@ -68,4 +68,4 @@
 @keyframes testimonial-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .cta-wrap { display: flex; justify-content: flex-end; margin-top: 24px; }
 @media (max-width: 1024px) { .problem-wrap, .solution-wrap { grid-template-columns: 1fr; min-height: 0; } .problem-image, .solution-image { min-height: 360px; } .pub-grid { grid-template-columns: 1fr; } .pub-bottom { grid-template-columns: 1fr; } }
-@media (max-width: 768px) { .hero-inner { padding: 56px 20px 80px; } .problem-panel, .solution-panel { padding: 40px 24px; } .problem-cards, .solution-cards { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .hero-inner { padding: 56px 20px 80px; } .problem-panel, .solution-panel { padding: 40px 24px; } .problem-cards, .solution-cards { grid-template-columns: 1fr; } .solution-image { display: none; } }
