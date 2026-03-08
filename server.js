@@ -26,6 +26,35 @@ const quickLinks = [
   { path: '/how-it-works', label: 'How It Works' },
 ];
 
+// SEO: recommended keywords & default meta (per-page metaDescription overrides in routes)
+const seo = {
+  siteName: 'BridgeDegree',
+  tagline: "Nigeria's Career Infrastructure Platform",
+  defaultDescription: 'Career infrastructure for Nigerian university students. Verified work experience, published research, and a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
+  baseUrl: process.env.BASE_URL || 'https://www.bridgdegree.com',
+  keywords: [
+    'Nigeria career platform',
+    'African graduate employability',
+    'work experience for students Nigeria',
+    'study abroad Nigeria',
+    'university career infrastructure Africa',
+    'student job placement Nigeria',
+    'academic publication support Nigeria',
+    'global mobility students Africa',
+    'internship placement Nigeria',
+    'final year project publication',
+    'scholarship pathway Nigeria',
+    'LinkedIn optimization students',
+    'SIWES alternative',
+    'graduate employment Africa',
+    'Nigerian university partnerships',
+    'postgraduate application support',
+    'how to get work experience as a Nigerian student',
+    'publish final year project Nigeria',
+    'study abroad after Nigerian university',
+  ].join(', '),
+};
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
@@ -39,57 +68,96 @@ app.use((req, res, next) => {
   res.locals.routes = routes;
   res.locals.quickLinks = quickLinks;
   res.locals.currentRoute = null; // set per route
+  res.locals.seo = seo;
+  res.locals.canonicalUrl = seo.baseUrl + req.path;
   next();
 });
 
 app.get('/', (req, res) => {
   res.locals.currentRoute = 'index';
-  res.render('index', { title: 'BridgeDegree', stylesheet: 'home' });
+  res.render('index', {
+    title: 'BridgeDegree',
+    stylesheet: 'home',
+    metaDescription: 'Nigeria\'s career infrastructure for university students. Get verified work experience, publish your research, and build a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
+  });
 });
 
 app.get('/students', (req, res) => {
   res.locals.currentRoute = 'students';
-  res.render('onboarding-students', { title: 'For Students' });
+  res.render('onboarding-students', {
+    title: 'For Students',
+    metaDescription: 'How to get work experience as a Nigerian student. Structured internships, final year project publication support, and a Career Passport. BridgeDegree runs alongside your degree.',
+  });
 });
 
 app.get('/students/apply', (req, res) => {
   res.locals.currentRoute = 'students_apply';
-  res.render('students-apply', { title: 'Apply', breadcrumb: [{ path: '/', label: 'Home' }, { path: '/students', label: 'Students' }, { label: 'Apply' }] });
+  res.render('students-apply', {
+    title: 'Apply',
+    breadcrumb: [{ path: '/', label: 'Home' }, { path: '/students', label: 'Students' }, { label: 'Apply' }],
+    metaDescription: 'Apply to BridgeDegree — Nigeria\'s career infrastructure for undergraduates. Student job placement, internship placement, and academic publication support.',
+  });
 });
 
 app.get('/partners', (req, res) => {
   res.locals.currentRoute = 'partners';
-  res.render('onboarding-partners', { title: 'For Partners' });
+  res.render('onboarding-partners', {
+    title: 'For Partners',
+    metaDescription: 'Partner with BridgeDegree. Get first access to pre-vetted Nigerian graduates with verified work experience and published research. Corporate and university partnerships.',
+  });
 });
 
 app.get('/how-it-works', (req, res) => {
   res.locals.currentRoute = 'how_it_works';
-  res.render('how-it-works', { title: 'How It Works' });
+  res.render('how-it-works', {
+    title: 'How It Works',
+    metaDescription: 'How BridgeDegree works: Work Experience Engine, Publication Pipeline, and Global Mobility Framework for Nigerian university students and graduate employability.',
+  });
 });
 
 app.get('/faq', (req, res) => {
   res.locals.currentRoute = 'faq';
-  res.render('faq', { title: 'FAQ', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'FAQ' }] });
+  res.render('faq', {
+    title: 'FAQ',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'FAQ' }],
+    metaDescription: 'Frequently asked questions about BridgeDegree: work experience for students in Nigeria, publishing final year project, study abroad, SIWES alternative, Career Passport.',
+  });
 });
 
 app.get('/blog', (req, res) => {
   res.locals.currentRoute = 'blog';
-  res.render('blog', { title: 'Blog', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Blog' }] });
+  res.render('blog', {
+    title: 'Blog',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Blog' }],
+    metaDescription: 'BridgeDegree blog: career tips for Nigerian students, graduate employment in Africa, internship placement, and study abroad after Nigerian university.',
+  });
 });
 
 app.get('/contact', (req, res) => {
   res.locals.currentRoute = 'contact';
-  res.render('contact', { title: 'Contact', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Contact' }] });
+  res.render('contact', {
+    title: 'Contact',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Contact' }],
+    metaDescription: 'Contact BridgeDegree — Nigeria\'s career infrastructure platform. Get in touch for students, partners, and universities.',
+  });
 });
 
 app.get('/about', (req, res) => {
   res.locals.currentRoute = 'about';
-  res.render('about', { title: 'About', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'About' }] });
+  res.render('about', {
+    title: 'About',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'About' }],
+    metaDescription: 'About BridgeDegree: career infrastructure for Nigerian university students. African graduate employability, university career infrastructure, and global mobility.',
+  });
 });
 
 app.get('/policy', (req, res) => {
   res.locals.currentRoute = 'policy';
-  res.render('policy', { title: 'Policy', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Policy' }] });
+  res.render('policy', {
+    title: 'Policy',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Policy' }],
+    metaDescription: 'BridgeDegree policy and terms. Nigeria career platform for students and partners.',
+  });
 });
 
 // Export for Vercel serverless; listen only when run directly
