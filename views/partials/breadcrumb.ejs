@@ -1,5 +1,5 @@
 <% if (typeof breadcrumb !== 'undefined' && breadcrumb && breadcrumb.length) { %>
-<div class="breadcrumb-wrap">
+<div class="breadcrumb-wrap<%= typeof breadcrumbDark !== 'undefined' && breadcrumbDark ? ' breadcrumb-dark' : '' %>">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <% breadcrumb.forEach(function(item, i) { %>

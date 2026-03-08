@@ -109,8 +109,10 @@ app.get('/partners', (req, res) => {
 
 app.get('/how-it-works', (req, res) => {
   res.locals.currentRoute = 'how_it_works';
+  res.locals.breadcrumbDark = true;
   res.render('how-it-works', {
     title: 'How It Works',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'How It Works' }],
     metaDescription: 'How BridgeDegree works: Work Experience Engine, Publication Pipeline, and Global Mobility Framework for Nigerian university students and graduate employability.',
   });
 });
@@ -144,6 +146,7 @@ app.get('/contact', (req, res) => {
 
 app.get('/about', (req, res) => {
   res.locals.currentRoute = 'about';
+  res.locals.breadcrumbDark = true;
   res.render('about', {
     title: 'About',
     breadcrumb: [{ path: '/', label: 'Home' }, { label: 'About' }],

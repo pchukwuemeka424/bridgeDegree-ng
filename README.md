@@ -62,10 +62,10 @@ Open **http://localhost:3000** (or the port set by the `PORT` environment variab
 
 ## Reusable pieces
 
-- **Header** — Top bar (email, phone) + main nav with active state; uses `routes` and `currentRoute` from `res.locals`.
+- **Header** — Top bar (email) + main nav with active state; uses `routes` and `currentRoute` from `res.locals`.
 - **Footer** — Brand (logo + tagline), quick links, contact + social; uses `quickLinks` and shared components.
 - **Breadcrumb** — Pass a `breadcrumb` array of `{ path?, label }`.
-- **Contact info** — Address, email, phone (Lucide icons).
+- **Contact info** — Email (Lucide icons).
 - **Social icons** — Used in footer.
 
 Routes and quick links are defined in `server.js` and passed to all views via `res.locals`.
