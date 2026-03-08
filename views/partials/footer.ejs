@@ -1,0 +1,30 @@
+<footer class="site-footer">
+  <div class="footer-main">
+    <div class="footer-main-inner">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo-link">
+          <img src="/images/logo.png" alt="BridgeDegree" class="footer-logo-img">
+        </a>
+        <p class="footer-tagline">Nigeria's Career Infrastructure Platform — graduate with verified experience and a Career Passport.</p>
+      </div>
+      <div class="footer-links">
+        <h3 class="footer-heading">Quick links</h3>
+        <nav class="footer-nav" aria-label="Footer menu">
+          <ul class="footer-menu">
+            <% quickLinks.forEach(function(link) { %>
+            <li><a href="<%= link.path %>"><%= link.label %></a></li>
+            <% }); %>
+          </ul>
+        </nav>
+      </div>
+      <div class="footer-contact">
+        <h3 class="footer-heading">Contact</h3>
+        <%- include('../components/contact-info') %>
+        <div class="footer-social">
+          <span class="footer-social-label">Follow us</span>
+          <%- include('../components/social-icons', { dark: true }) %>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>

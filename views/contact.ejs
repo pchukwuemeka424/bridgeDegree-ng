@@ -1,0 +1,99 @@
+<style>
+  .contact-hero { padding: 64px 0 48px; text-align: center; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .contact-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.85rem, 3vw, 2.35rem); font-weight: 400; margin-bottom: 12px; }
+  .contact-hero .subtitle { font-size: 1.1rem; color: var(--text-muted); max-width: 560px; margin: 0 auto 40px; }
+  .contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; max-width: 900px; margin: 0 auto; }
+  .contact-info { background: var(--surface-2); border-radius: var(--radius); padding: 32px; border: 1px solid var(--border); }
+  .contact-info h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+  .contact-item { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
+  .contact-item:last-child { margin-bottom: 0; }
+  .contact-item .icon-wrap { width: 44px; height: 44px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: var(--accent-green-soft); border-radius: var(--radius-sm); color: var(--accent-green); }
+  .contact-item .lucide { width: 22px; height: 22px; }
+  .contact-item a { color: var(--accent-green); font-weight: 600; text-decoration: none; }
+  .contact-item a:hover { text-decoration: underline; }
+  .contact-item p { font-size: 0.95rem; color: var(--text-muted); margin-top: 4px; line-height: 1.5; }
+  .contact-form-wrap { background: var(--surface); padding: 40px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+  .contact-form-wrap h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 24px; color: var(--text); }
+  .contact-note { font-size: 0.9rem; color: var(--text-muted); margin-top: 20px; line-height: 1.5; }
+  @media (max-width: 768px) { .contact-layout { grid-template-columns: 1fr; } }
+</style>
+
+<section class="contact-hero">
+  <div class="container">
+    <h1>Get in touch</h1>
+    <p class="subtitle">Have a question about BridgeDegree, the programme, or partnerships? We're here to help. Reach out by email or phone, or send a message below.</p>
+  </div>
+</section>
+
+<section class="page-section" style="padding-top: 0;">
+  <div class="container">
+    <div class="contact-layout">
+      <div class="contact-info">
+        <h2>Contact information</h2>
+        <div class="contact-item">
+          <div class="icon-wrap"><i data-lucide="mail"></i></div>
+          <div>
+            <a href="mailto:infor@bridgedegree.com">infor@bridgedegree.com</a>
+            <p>For general enquiries, student applications, and partner interest.</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon-wrap"><i data-lucide="phone"></i></div>
+          <div>
+            <a href="tel:+2348012345678">+234 801 234 5678</a>
+            <p>Call us for urgent enquiries or to speak with the advisory team.</p>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="icon-wrap"><i data-lucide="clock"></i></div>
+          <div>
+            <span style="font-weight: 600; color: var(--text);">Response time</span>
+            <p>We aim to respond within 48 hours for applications and within 2 business days for partnership enquiries.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form-wrap">
+        <h2>Send a message</h2>
+        <form id="contactForm" action="#" method="post">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Name *</label>
+              <input type="text" id="name" name="name" required placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label for="email">Email *</label>
+              <input type="email" id="email" name="email" required placeholder="your@email.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+              <option value="">Select a topic</option>
+              <option value="Student enquiry">Student enquiry</option>
+              <option value="Partner enquiry">Partner enquiry</option>
+              <option value="University / Advocate">University / Advocate</option>
+              <option value="Press / Media">Press / Media</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Message *</label>
+            <textarea id="message" name="message" required placeholder="How can we help?" minlength="10"></textarea>
+          </div>
+          <button type="submit" class="btn-primary">Send message</button>
+        </form>
+        <div class="form-success" id="contactSuccess">Thank you for your message. We'll get back to you within 48 hours.</div>
+        <p class="contact-note">If you're ready to apply as a student or partner, use the dedicated forms on the <a href="/students">Students</a> or <a href="/partners">Partners</a> pages for a faster response.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.style.display = 'none';
+    document.getElementById('contactSuccess').classList.add('show');
+  });
+</script>

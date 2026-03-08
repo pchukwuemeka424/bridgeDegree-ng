@@ -1,0 +1,134 @@
+<style>
+  .page-hero { position: relative; min-height: 50vh; display: flex; align-items: center; background: linear-gradient(135deg, var(--header-dark) 0%, #2a4a6f 100%); color: var(--surface); padding: 80px 0; }
+  .page-hero .container { position: relative; z-index: 2; }
+  .page-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 4vw, 2.75rem); font-weight: 400; margin-bottom: 16px; color: var(--surface); }
+  .page-hero .hero-sub { font-size: 1.15rem; opacity: 0.95; max-width: 640px; line-height: 1.7; margin-bottom: 28px; }
+  .page-hero .hero-btns { display: flex; flex-wrap: wrap; gap: 14px; }
+  .page-hero .btn-primary { background: var(--accent-green); color: var(--surface); }
+  .page-hero .btn-hero-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: var(--radius-sm); font-weight: 600; background: rgba(255,255,255,0.15); color: var(--surface); text-decoration: none; border: 2px solid rgba(255,255,255,0.4); transition: opacity 0.2s; }
+  .page-hero .btn-hero-secondary:hover { background: rgba(255,255,255,0.25); color: var(--surface); }
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px; }
+  .compare-box { padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--surface); }
+  .compare-box h4 { font-size: 1rem; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+  .compare-box ul { list-style: none; }
+  .compare-box li { position: relative; padding-left: 20px; margin-bottom: 8px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+  .compare-box li::before { content: '•'; position: absolute; left: 0; color: var(--text-muted); }
+  .compare-box.highlight { border-color: var(--accent-green); background: var(--accent-green-soft); }
+  .compare-box.highlight li::before { color: var(--accent-green); }
+  .engine-card { background: var(--surface); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; border: 1px solid var(--border); }
+  .engine-card h3 { font-size: 1.2rem; font-weight: 700; color: var(--accent-green); margin-bottom: 10px; }
+  .engine-card p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.65; }
+  .who-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
+  .who-card { background: var(--surface); padding: 24px; border-radius: var(--radius); border: 1px solid var(--border); }
+  .who-card h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+  .who-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+  .steps-list { list-style: none; counter-reset: step; }
+  .steps-list li { position: relative; padding-left: 48px; margin-bottom: 24px; counter-increment: step; }
+  .steps-list li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 32px; height: 32px; background: var(--accent-green); color: var(--surface); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; }
+  .steps-list h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+  .steps-list p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; }
+  @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } }
+</style>
+
+<section class="page-hero">
+  <div class="container">
+    <h1>You will graduate. Make sure you graduate with proof.</h1>
+    <p class="hero-sub">Your degree tells employers you attended university. BridgeDegree proves what you can actually do — with verified work experience, published research, and a globally recognised career portfolio built while you are still in school.</p>
+    <div class="hero-btns">
+      <a href="/students/apply#apply" class="btn-primary">Start My Application <i data-lucide="arrow-right"></i></a>
+      <a href="/how-it-works" class="btn-hero-secondary">See How It Works <i data-lucide="external-link"></i></a>
+    </div>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <h2>The Nigerian graduate's invisible problem</h2>
+    <p class="subtitle">Nigeria produces over 600,000 graduates every year. Most are intelligent. Many are hardworking. Nearly all are invisible to employers.</p>
+    <div class="compare-grid">
+      <div class="compare-box">
+        <h4>What your degree gives you</h4>
+        <ul>
+          <li>A certificate confirming you attended</li>
+          <li>A transcript of your grades</li>
+          <li>Academic knowledge from lectures</li>
+        </ul>
+      </div>
+      <div class="compare-box highlight">
+        <h4>What employers actually ask for</h4>
+        <ul>
+          <li>Verified, documented work experience</li>
+          <li>Published or commercially applied research</li>
+          <li>A globally legible professional profile</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section" style="background: var(--surface-2);">
+  <div class="container">
+    <h2>Not a course. Not a bootcamp. Infrastructure.</h2>
+    <p class="subtitle">BridgeDegree is Nigeria's first embedded career infrastructure platform. We build your professional identity using verified, documented, irrefutable proof.</p>
+    <div class="engine-card">
+      <h3>Engine 1: Work Experience Engine</h3>
+      <p>Structured internships begin from 200 Level with vetted Nigerian and international corporate partners. Every placement is performance-tracked and mentor-validated. By graduation, you have 2+ years of documented, blockchain-credentialed work experience.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Engine 2: Publication Pipeline</h3>
+      <p>Your final-year project is aligned to a real industry brief and co-authored for submission to an indexed, peer-reviewed journal. You graduate with your name on published research.</p>
+    </div>
+    <div class="engine-card">
+      <h3>Engine 3: Global Mobility Framework</h3>
+      <p>From Year 2, we build your international career profile — scholarship research, statement of purpose support, international CV, ATS calibration, LinkedIn optimisation, and post-graduation migration support.</p>
+    </div>
+    <p style="color: var(--text-muted); line-height: 1.7;">Everything you produce is aggregated into your <strong>Career Passport</strong>: a single blockchain-credentialed record verifiable by any employer, anywhere, instantly.</p>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <h2>Built for every stage of your university journey</h2>
+    <p class="subtitle">Who BridgeDegree is for</p>
+    <div class="who-grid">
+      <div class="who-card">
+        <h4>Undergraduate Students (100–500 Level)</h4>
+        <p>Start from 100 Level. First internship placement begins at 200 Level — giving you the maximum years to build a verified work record before graduation.</p>
+      </div>
+      <div class="who-card">
+        <h4>NYSC Corps Members</h4>
+        <p>BridgeDegree After is designed specifically for corps members. Immediate urgency, targeted placement support, and a career acceleration module built for your 12-month NYSC window.</p>
+      </div>
+      <div class="who-card">
+        <h4>Postgraduate Students</h4>
+        <p>Research-forward students who want their work to reach the world. The Publication Pipeline supports co-authorship, journal submission, and research commercialisation.</p>
+      </div>
+      <div class="who-card">
+        <h4>Final-Year Students (400–500 Level)</h4>
+        <p>Even if you are joining late, BridgeDegree can build your Career Passport through accelerated publication support, employer placement assistance, and global profile development before you graduate.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="page-section" style="background: var(--surface-2);">
+  <div class="container">
+    <h2>From this page to your first placement in four steps</h2>
+    <p class="subtitle">The application process</p>
+    <ol class="steps-list">
+      <li>
+        <h4>Submit Your Application</h4>
+        <p>Fill in the application form with your details, university level, and programme interest. This takes under 5 minutes.</p>
+        <p style="margin-top: 12px;"><a href="/students/apply#apply" class="btn-primary">Go to application form <i data-lucide="arrow-right"></i></a></p>
+      </li>
+      <li>
+        <h4>Career Assessment & Mentor Assignment</h4>
+        <p>Complete a short career assessment so we can match you to the right corporate partners and assign your programme mentor.</p>
+      </li>
+      <li>
+        <h4>Enrolment & Programme Start</h4>
+        <p>Once enrolled, your Career Passport is created and your pathway begins — with your first internship placement from 200 Level and ongoing support through graduation and beyond.</p>
+      </li>
+    </ol>
+  </div>
+</section>

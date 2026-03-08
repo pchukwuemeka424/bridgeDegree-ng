@@ -1,0 +1,156 @@
+<style>
+  .apply-page { padding: 40px 0 64px; }
+  .apply-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
+  .apply-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; margin: 0; }
+  .apply-hero a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent-green); font-weight: 600; text-decoration: none; font-size: 0.95rem; }
+  .apply-hero a:hover { text-decoration: underline; }
+  .apply-hero .lucide { width: 18px; height: 18px; }
+  .apply-two-col { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: start; max-width: 1100px; margin: 0 auto; }
+  .apply-info { position: sticky; top: 100px; }
+  .apply-info-card { background: linear-gradient(160deg, var(--header-dark) 0%, #2a4a6f 100%); color: var(--surface); padding: 32px; border-radius: var(--radius); }
+  .apply-info-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; color: var(--surface); }
+  .apply-info-card ul { list-style: none; }
+  .apply-info-card li { position: relative; padding-left: 24px; margin-bottom: 14px; font-size: 0.95rem; opacity: 0.95; line-height: 1.5; }
+  .apply-info-card li .lucide { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; color: var(--accent-green-bright); }
+  .apply-info-card .contact-row { margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.2); }
+  .apply-info-card .contact-row a { color: var(--surface); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+  .apply-info-card .contact-row a:hover { text-decoration: underline; }
+  .apply-info-card .contact-row p { font-size: 0.85rem; opacity: 0.85; margin-top: 8px; }
+  .apply-info-card .time { font-size: 0.85rem; margin-top: 20px; opacity: 0.9; }
+  .form-card { background: var(--surface); padding: 40px; border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+  .form-card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; }
+  .form-card .form-intro { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 28px; }
+  .form-card .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .form-card .form-checkbox { display: flex; align-items: flex-start; gap: 12px; }
+  .form-card .form-checkbox input { margin-top: 4px; width: auto; }
+  .form-card .btn-primary { width: 100%; justify-content: center; padding: 16px; font-size: 1rem; margin-top: 8px; }
+  .form-success { display: none; padding: 24px; background: var(--accent-green-soft); border-radius: var(--radius-sm); color: var(--accent-green); font-weight: 500; margin-top: 24px; border: 1px solid rgba(26, 77, 62, 0.2); }
+  .form-success.show { display: block; }
+  @media (max-width: 900px) { .apply-two-col { grid-template-columns: 1fr; } .apply-info { position: static; } .form-card .form-row { grid-template-columns: 1fr; } }
+</style>
+
+<section class="apply-page">
+  <div class="container">
+    <div class="apply-hero">
+      <h1>Student application</h1>
+      <a href="/students"><i data-lucide="arrow-left"></i> Back to Students</a>
+    </div>
+  </div>
+</section>
+
+<section class="page-section" style="padding-top: 0;" id="apply">
+  <div class="container">
+    <div class="apply-two-col">
+      <div class="apply-info">
+        <div class="apply-info-card">
+          <h3>What happens next</h3>
+          <ul>
+            <li><i data-lucide="check-circle"></i> We review your application and match you to the right programme track.</li>
+            <li><i data-lucide="check-circle"></i> A BridgeDegree advisor will contact you within 48 hours to discuss your goals.</li>
+            <li><i data-lucide="check-circle"></i> You'll complete a short career assessment and receive your mentor assignment.</li>
+            <li><i data-lucide="check-circle"></i> Once enrolled, your Career Passport is created and your first placement pathway begins.</li>
+          </ul>
+          <div class="contact-row">
+            <a href="mailto:infor@bridgedegree.com"><i data-lucide="mail"></i> infor@bridgedegree.com</a>
+            <p>Questions? Email us anytime.</p>
+            <a href="tel:+2348012345678" style="margin-top: 12px; display: inline-block;"><i data-lucide="phone"></i> +234 801 234 5678</a>
+          </div>
+          <p class="time">Takes about 5 minutes to complete.</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h2>Apply now</h2>
+        <p class="form-intro">Fill in your details below. A BridgeDegree advisor will be in touch within 48 hours.</p>
+        <form id="studentForm" action="#" method="post">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstname">First Name *</label>
+              <input type="text" id="firstname" name="firstname" required placeholder="e.g. Chioma">
+            </div>
+            <div class="form-group">
+              <label for="lastname">Last Name *</label>
+              <input type="text" id="lastname" name="lastname" required placeholder="e.g. Okonkwo">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="email">Email Address *</label>
+              <input type="email" id="email" name="email" required placeholder="you@example.com">
+            </div>
+            <div class="form-group">
+              <label for="phone">Phone Number *</label>
+              <input type="tel" id="phone" name="phone" required placeholder="e.g. +234 800 000 0000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="university">University / Institution *</label>
+            <input type="text" id="university" name="university" required placeholder="Your university name">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="level">Current Level *</label>
+              <select id="level" name="level" required>
+                <option value="">Select level</option>
+                <option value="100L">100L</option>
+                <option value="200L">200L</option>
+                <option value="300L">300L</option>
+                <option value="400L">400L</option>
+                <option value="500L">500L</option>
+                <option value="Postgraduate">Postgraduate</option>
+                <option value="NYSC">NYSC Corps Member</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="department">Field of Study / Department *</label>
+              <input type="text" id="department" name="department" required placeholder="e.g. Computer Science">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="programme">Programme Interest *</label>
+            <select id="programme" name="programme" required>
+              <option value="">Select interest</option>
+              <option value="Core">Core</option>
+              <option value="Core + Global Mobility">Core + Global Mobility</option>
+              <option value="BridgeDegree After">BridgeDegree After</option>
+              <option value="Not sure">Not sure</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="career_goal">Primary Career Goal</label>
+            <input type="text" id="career_goal" name="career_goal" placeholder="e.g. I want to work in tech in the UK within 2 years of graduation">
+          </div>
+          <div class="form-group">
+            <label for="hear_about">How did you hear about BridgeDegree?</label>
+            <select id="hear_about" name="hear_about">
+              <option value="">Select</option>
+              <option value="Lecturer">Lecturer</option>
+              <option value="Friend">Friend</option>
+              <option value="Social media">Social media</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Search">Search</option>
+              <option value="Parent">Parent</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group form-checkbox">
+            <input type="checkbox" id="consent" name="consent" required>
+            <label for="consent">I consent to be contacted by BridgeDegree *</label>
+          </div>
+          <button type="submit" class="btn-primary">Submit Application</button>
+        </form>
+        <div class="form-success" id="formSuccess">
+          Your application has been received. A BridgeDegree advisor will be in touch within 48 hours to discuss your programme track and next steps. Welcome to BridgeDegree.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.getElementById('studentForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    this.style.display = 'none';
+    document.getElementById('formSuccess').classList.add('show');
+  });
+</script>

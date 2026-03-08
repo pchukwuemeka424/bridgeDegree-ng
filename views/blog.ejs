@@ -1,0 +1,81 @@
+<style>
+  .blog-hero { padding: 56px 0 40px; text-align: center; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .blog-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.85rem, 3vw, 2.35rem); font-weight: 400; margin-bottom: 12px; }
+  .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
+  .blog-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+  .blog-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+  .blog-card a { text-decoration: none; color: inherit; display: block; }
+  .blog-card .meta { display: flex; gap: 12px; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; }
+  .blog-card .tag { color: var(--accent-green); font-weight: 600; }
+  .blog-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; line-height: 1.35; color: var(--text); }
+  .blog-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+  .blog-card .card-inner { padding: 24px; }
+</style>
+
+<section class="blog-hero">
+  <div class="container">
+    <h1>Blog</h1>
+    <p class="subtitle">Insights on career infrastructure, graduate outcomes, and building proof — not just credentials.</p>
+  </div>
+</section>
+
+<section class="page-section">
+  <div class="container">
+    <div class="blog-grid">
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">The Real Problem</span><span>March 2026</span><span>8 min read</span></div>
+            <h3>Why Your Degree Is Not Enough — And Why That Is Not Your Fault</h3>
+            <p>The Nigerian university system was not designed to produce employable graduates. The gap between a degree and a career is a systemic design flaw — not a personal failure.</p>
+          </div>
+        </a>
+      </article>
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">Career Strategy</span><span>March 2026</span><span>6 min read</span></div>
+            <h3>The NYSC Year Is Not a Waiting Period — It Is Your Last Window</h3>
+            <p>Most corps members treat NYSC as something to endure. The ones who secure competitive employment use it as a final 12-month sprint to build credentials.</p>
+          </div>
+        </a>
+      </article>
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">Japa & Global Mobility</span><span>February 2026</span><span>7 min read</span></div>
+            <h3>Japa Done Right: How to Position Yourself for International Opportunities Before You Graduate</h3>
+            <p>International employers and graduate schools are looking for something they can verify. Here's how to build it before you graduate.</p>
+          </div>
+        </a>
+      </article>
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">Research & Publishing</span><span>February 2026</span><span>5 min read</span></div>
+            <h3>Your Final Year Project Deserves Better Than a Shelf</h3>
+            <p>Nigerian universities generate thousands of valuable research projects every year. BridgeDegree is the system that takes your project from submission to publication.</p>
+          </div>
+        </a>
+      </article>
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">For Parents</span><span>January 2026</span><span>6 min read</span></div>
+            <h3>A Parent's Guide to BridgeDegree: What It Is, What It Costs, and Why It Matters</h3>
+            <p>You are already investing in your child's degree. BridgeDegree is the investment that makes the degree worth what you paid for it.</p>
+          </div>
+        </a>
+      </article>
+      <article class="blog-card">
+        <a href="#">
+          <div class="card-inner">
+            <div class="meta"><span class="tag">Employer Perspective</span><span>January 2026</span><span>7 min read</span></div>
+            <h3>What Nigerian Employers Actually Want — And What Most CVs Are Missing</h3>
+            <p>Employers are not looking for the most impressive degree. They are looking for evidence. Most Nigerian graduates cannot provide it.</p>
+          </div>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>

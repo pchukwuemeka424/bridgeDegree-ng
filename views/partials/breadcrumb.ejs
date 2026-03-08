@@ -1,0 +1,16 @@
+<% if (typeof breadcrumb !== 'undefined' && breadcrumb && breadcrumb.length) { %>
+<div class="breadcrumb-wrap">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <% breadcrumb.forEach(function(item, i) { %>
+        <% if (i > 0) { %><span class="sep">/</span><% } %>
+        <% if (item.path) { %>
+          <a href="<%= item.path %>"><%= item.label %></a>
+        <% } else { %>
+          <span class="current"><%= item.label %></span>
+        <% } %>
+      <% }); %>
+    </nav>
+  </div>
+</div>
+<% } %>

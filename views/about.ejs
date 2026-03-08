@@ -1,0 +1,78 @@
+<style>
+  .about-hero { padding: 72px 0 56px; text-align: center; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .about-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 400; margin-bottom: 16px; }
+  .about-hero .tagline { font-size: 1.2rem; color: var(--accent-green); font-weight: 600; margin-bottom: 12px; }
+  .about-hero p { font-size: 1.05rem; color: var(--text-muted); max-width: 640px; margin: 0 auto; line-height: 1.7; }
+  .about-section { padding: 64px 0; }
+  .about-section.alt { background: var(--surface-2); }
+  .about-section h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.5rem, 2.2vw, 1.85rem); font-weight: 400; margin-bottom: 16px; }
+  .about-section p { font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; max-width: 720px; }
+  .about-section p:last-child { margin-bottom: 0; }
+  .about-values { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-top: 32px; }
+  .about-value { background: var(--surface); padding: 28px 24px; border-radius: var(--radius); border: 1px solid var(--border); }
+  .about-value .icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background: var(--accent-green-soft); border-radius: var(--radius-sm); color: var(--accent-green); margin-bottom: 16px; }
+  .about-value .icon .lucide { width: 24px; height: 24px; }
+  .about-value h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
+  .about-value p { font-size: 0.95rem; margin: 0; max-width: none; }
+  .about-cta { text-align: center; padding: 56px 0; }
+  .about-cta .btn-primary { margin: 0 8px 8px 0; }
+  @media (max-width: 768px) { .about-hero { padding: 48px 0 40px; } .about-section { padding: 48px 0; } }
+</style>
+
+<section class="about-hero">
+  <div class="container">
+    <p class="tagline">Nigeria's Career Infrastructure Platform</p>
+    <h1>About BridgeDegree</h1>
+    <p>We build the verified professional identity of Nigerian students — from their first day in university to their first day in a global career. Not a course. Not a bootcamp. Infrastructure.</p>
+  </div>
+</section>
+
+<section class="about-section">
+  <div class="container">
+    <h2>Why we exist</h2>
+    <p>Nigeria produces over 600,000 graduates every year. Most are qualified. Nearly all are invisible to employers — not because they lack ability, but because the university system produces academic records and nothing else. No verified work history. No published research. No globally legible career profile.</p>
+    <p>BridgeDegree was founded in 2026 to solve this at the structural level. We give students a way to build proof while they study — so that by graduation, they hold credentials any employer, anywhere, can verify in seconds.</p>
+  </div>
+</section>
+
+<section class="about-section alt">
+  <div class="container">
+    <h2>What we do</h2>
+    <p>We run three programme engines alongside a student's university education:</p>
+    <div class="about-values">
+      <div class="about-value">
+        <div class="icon"><i data-lucide="briefcase"></i></div>
+        <h3>Work Experience Engine</h3>
+        <p>Structured internships from 200 Level with vetted partners. Performance-tracked, mentor-validated, blockchain-credentialed. So you graduate with 2+ years of documented experience.</p>
+      </div>
+      <div class="about-value">
+        <div class="icon"><i data-lucide="book-open"></i></div>
+        <h3>Publication Pipeline</h3>
+        <p>Your final-year project becomes co-authored, submitted to an indexed journal, and part of your permanent academic portfolio — the credential that separates you globally.</p>
+      </div>
+      <div class="about-value">
+        <div class="icon"><i data-lucide="globe"></i></div>
+        <h3>Global Mobility Framework</h3>
+        <p>Scholarship strategy, SOP development, international CV, ATS calibration, and post-graduation migration support. The tier that turns your proof into global opportunity.</p>
+      </div>
+    </div>
+    <p style="margin-top: 32px;">Everything a student produces — every internship, publication, and mentor validation — is aggregated into their <strong>Career Passport</strong>: a single blockchain-credentialed record verifiable by any employer, anywhere, instantly.</p>
+  </div>
+</section>
+
+<section class="about-section">
+  <div class="container">
+    <h2>Our approach</h2>
+    <p>BridgeDegree operates independently of any university. We don't require institutional approval or affiliation. Individual lecturers and departments recommend us to their students — but the platform is not a university product. We work with students at every stage: from 100 Level through NYSC and into postgraduate and global careers.</p>
+    <p>We publish our outcomes — student case studies, employer endorsements, and placement data — because trust must be proved, not claimed.</p>
+  </div>
+</section>
+
+<section class="about-section alt about-cta">
+  <div class="container">
+    <h2 style="margin-bottom: 12px;">Ready to start?</h2>
+    <p style="margin-bottom: 24px;">Join BridgeDegree and graduate with proof.</p>
+    <a href="/students/apply#apply" class="btn-primary">Start My Application <i data-lucide="arrow-right"></i></a>
+    <a href="/contact" class="btn-secondary">Contact us</a>
+  </div>
+</section>
