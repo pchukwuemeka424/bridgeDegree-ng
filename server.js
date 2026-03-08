@@ -92,6 +92,10 @@ app.get('/policy', (req, res) => {
   res.render('policy', { title: 'Policy', breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Policy' }] });
 });
 
-app.listen(PORT, () => {
-  console.log(`BridgeDegree running at http://localhost:${PORT}`);
-});
+// Export for Vercel serverless; listen only when run directly
+module.exports = app;
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`BridgeDegree running at http://localhost:${PORT}`);
+  });
+}
