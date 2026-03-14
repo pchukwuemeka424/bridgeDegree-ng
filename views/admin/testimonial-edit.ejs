@@ -1,6 +1,10 @@
-<h1 class="admin-page-title"><%= testimonial ? 'Edit testimonial' : 'New testimonial' %></h1>
-<p style="margin-bottom: 20px;"><a href="/admin/testimonials" class="admin-btn admin-btn-secondary">Back to testimonials</a></p>
-
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / <a href="/admin/testimonials">Testimonials</a> / <%= testimonial ? 'Edit' : 'New' %></nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="message-square-quote"></i> <%= testimonial ? 'Edit testimonial' : 'New testimonial' %></h1>
+</div>
+<div class="admin-actions">
+  <a href="/admin/testimonials" class="admin-btn admin-btn-secondary">Back to testimonials</a>
+</div>
 <div class="admin-card">
   <form method="post" action="<%= testimonial ? '/admin/testimonials/' + testimonial._id : '/admin/testimonials' %>">
     <div class="admin-form-group">

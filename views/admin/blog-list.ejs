@@ -1,5 +1,14 @@
-<h1 class="admin-page-title">Blog posts</h1>
-<p style="margin-bottom: 20px;"><a href="/admin/blog/new" class="admin-btn admin-btn-primary">New post</a> <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a></p>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Blog</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="file-text"></i> Blog posts</h1>
+  <p class="admin-page-desc">Create and manage blog posts for the public site.</p>
+</div>
+
+<div class="admin-actions">
+  <a href="/admin/blog/new" class="admin-btn admin-btn-primary"><i data-lucide="plus"></i> New post</a>
+  <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
+</div>
+
 <div class="admin-card">
   <% if (posts && posts.length) { %>
   <table class="admin-table">
@@ -29,6 +38,6 @@
     </tbody>
   </table>
   <% } else { %>
-  <p>No posts yet. <a href="/admin/blog/new">Create your first post</a>.</p>
+  <p>No posts yet. <a href="/admin/blog/new" class="admin-btn admin-btn-primary" style="margin-top:12px;">Create your first post</a></p>
   <% } %>
 </div>

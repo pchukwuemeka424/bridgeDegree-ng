@@ -11,7 +11,6 @@ const blogPostSchema = new mongoose.Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-blogPostSchema.index({ slug: 1 });
 blogPostSchema.index({ createdAt: -1 });
 
 function slugify(text) {

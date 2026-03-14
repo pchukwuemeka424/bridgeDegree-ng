@@ -1,17 +1,28 @@
-<div class="admin-card" style="max-width: 400px; margin: 60px auto;">
-  <h1 class="admin-page-title">Admin Login</h1>
-  <% if (typeof error !== 'undefined' && error) { %>
-  <p class="admin-error"><%= error %></p>
-  <% } %>
-  <form method="post" action="/admin/login">
-    <div class="admin-form-group">
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required autocomplete="email">
+<div class="admin-login">
+  <div class="admin-login__card">
+    <div class="admin-login__brand">
+      <h1 class="admin-login__brand-name">BridgeDegree</h1>
+      <p class="admin-login__brand-tag">Admin</p>
     </div>
-    <div class="admin-form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required autocomplete="current-password">
-    </div>
-    <button type="submit" class="admin-btn admin-btn-primary">Sign in</button>
-  </form>
+    <% if (typeof error !== 'undefined' && error) { %>
+    <p class="admin-login__error"><%= error %></p>
+    <% } %>
+    <form method="post" action="/admin/login">
+      <p class="admin-login__title">Sign in to your account</p>
+      <div class="admin-form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required autocomplete="email" placeholder="admin@bridgedegree.com">
+      </div>
+      <div class="admin-form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button type="submit" class="admin-login__submit">Sign in</button>
+    </form>
+    <p class="admin-login__links">
+      <a href="/admin">Go to dashboard</a>
+      <span>·</span>
+      <a href="/">← Back to site</a>
+    </p>
+  </div>
 </div>

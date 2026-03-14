@@ -1,5 +1,13 @@
-<h1 class="admin-page-title">Testimonials</h1>
-<p style="margin-bottom: 20px;"><a href="/admin/testimonials/new" class="admin-btn admin-btn-primary">New testimonial</a> <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a></p>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Testimonials</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="message-square-quote"></i> Testimonials</h1>
+  <p class="admin-page-desc">Manage testimonials shown on the homepage and across the site.</p>
+</div>
+
+<div class="admin-actions">
+  <a href="/admin/testimonials/new" class="admin-btn admin-btn-primary"><i data-lucide="plus"></i> New testimonial</a>
+  <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
+</div>
 
 <div class="admin-card">
   <% if (testimonials && testimonials.length) { %>
@@ -16,8 +24,8 @@
     <tbody>
       <% testimonials.forEach(function(t) { %>
       <tr>
-        <td><%= t.name %><% if (t.location) { %> <span style="color: var(--text-muted); font-size: 0.9rem;">— <%= t.location %></span><% } %></td>
-        <td><%= t.role || '' %></td>
+        <td><%= t.name %><% if (t.location) { %> <span style="color: #64748b; font-size: 0.85rem;">— <%= t.location %></span><% } %></td>
+        <td><%= t.role || '—' %></td>
         <td><span class="admin-badge <%= t.featured ? 'admin-badge-published' : 'admin-badge-draft' %>"><%= t.featured ? 'Yes' : 'No' %></span></td>
         <td><%= t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '' %></td>
         <td class="actions">
@@ -31,7 +39,6 @@
     </tbody>
   </table>
   <% } else { %>
-  <p>No testimonials yet. <a href="/admin/testimonials/new">Create your first testimonial</a>.</p>
+  <p>No testimonials yet. <a href="/admin/testimonials/new" class="admin-btn admin-btn-primary" style="margin-top:12px;">Create your first testimonial</a></p>
   <% } %>
 </div>
-

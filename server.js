@@ -2,19 +2,14 @@ require('dotenv').config();
 const path = require('path');
 const os = require('os');
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts');
-const session = require('express-session');
 const { connectDB } = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'bridgedegree-admin-secret-change-in-production',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
-}));
+app.use(cookieParser());
 
 // Routes config for nav/footer (reusable across components)
 const routes = {
@@ -97,7 +92,9 @@ app.get('/students', (req, res) => {
   });
 });
 
-const adminRoutes = require('./routes/admin');
+const adminPublic = require('./routes/admin-public');
+const adminProtected = require('./routes/admin-protected');
+const { requireAdmin } = require('./middleware/auth');
 const studentRoutes = require('./routes/student');
 const StudentApplication = require('./models/StudentApplication');
 const BlogPost = require('./models/BlogPost');
@@ -141,7 +138,9 @@ app.get('/', async (req, res) => {
   });
 });
 
-app.use('/admin', adminRoutes);
+// Admin: public routes first (login/logout), then protected routes with auth
+app.use('/admin', adminPublic);
+app.use('/admin', requireAdmin, adminProtected);
 app.use('/student', studentRoutes);
 
 app.get('/students/apply', (req, res) => {
@@ -243,12 +242,18 @@ app.get('/blog/:slug', async (req, res) => {
   try {
     const post = await BlogPost.findOne({ slug: req.params.slug, published: true }).lean();
     if (!post) return res.redirect('/blog');
+    const recentPosts = await BlogPost.find({ published: true, _id: { $ne: post._id } })
+      .sort({ createdAt: -1 })
+      .limit(6)
+      .select('title slug createdAt image')
+      .lean();
     res.locals.currentRoute = 'blog';
     res.render('blog-single', {
       title: post.title,
       breadcrumb: [{ path: '/', label: 'Home' }, { path: '/blog', label: 'Blog' }, { label: post.title }],
       metaDescription: post.excerpt || post.content.slice(0, 160),
       post,
+      recentPosts,
     });
   } catch (err) {
     res.redirect('/blog');

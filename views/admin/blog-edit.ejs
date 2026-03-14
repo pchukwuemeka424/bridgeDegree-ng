@@ -1,5 +1,10 @@
-<h1 class="admin-page-title"><%= post ? 'Edit post' : 'New post' %></h1>
-<p style="margin-bottom: 20px;"><a href="/admin/blog" class="admin-btn admin-btn-secondary">Back to blog</a></p>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / <a href="/admin/blog">Blog</a> / <%= post ? 'Edit' : 'New' %></nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="file-text"></i> <%= post ? 'Edit post' : 'New post' %></h1>
+</div>
+<div class="admin-actions">
+  <a href="/admin/blog" class="admin-btn admin-btn-secondary">Back to blog</a>
+</div>
 <div class="admin-card">
   <form method="post" action="<%= post ? '/admin/blog/' + post._id : '/admin/blog' %>" enctype="multipart/form-data">
     <div class="admin-form-group">

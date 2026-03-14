@@ -36,7 +36,6 @@ const studentApplicationSchema = new mongoose.Schema({
 });
 
 studentApplicationSchema.index({ email: 1 });
-studentApplicationSchema.index({ applicationId: 1 });
 studentApplicationSchema.index({ submittedAt: -1 });
 
 studentApplicationSchema.pre('save', function () {

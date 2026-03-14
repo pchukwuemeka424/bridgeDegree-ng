@@ -1,5 +1,13 @@
-<h1 class="admin-page-title">Student applications</h1>
-<p style="margin-bottom: 20px;"><a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a></p>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Applications</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="users"></i> Student applications</h1>
+  <p class="admin-page-desc">Review and update status of student applications.</p>
+</div>
+
+<div class="admin-actions">
+  <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
+</div>
+
 <div class="admin-card">
   <% if (applications && applications.length) { %>
   <table class="admin-table">
@@ -25,7 +33,7 @@
         <td><%= a.level %></td>
         <td>
           <form method="post" action="/admin/applications/<%= a._id %>/status" style="display:inline;">
-            <select name="status" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 6px;">
+            <select name="status" onchange="this.form.submit()" class="admin-select">
               <option value="submitted" <%= a.status === 'submitted' ? 'selected' : '' %>>Submitted</option>
               <option value="under_review" <%= a.status === 'under_review' ? 'selected' : '' %>>Under review</option>
               <option value="shortlisted" <%= a.status === 'shortlisted' ? 'selected' : '' %>>Shortlisted</option>

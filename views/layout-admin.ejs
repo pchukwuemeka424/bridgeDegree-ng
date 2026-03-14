@@ -12,23 +12,73 @@
   <link rel="stylesheet" href="/css/admin.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="admin-body">
-  <header class="admin-header">
-    <div class="admin-header-inner">
-      <a href="/admin" class="admin-logo">BridgeDegree Admin</a>
-      <nav class="admin-nav">
-        <a href="/admin">Dashboard</a>
-        <a href="/admin/blog">Blog</a>
-        <a href="/admin/testimonials">Testimonials</a>
-        <a href="/admin/applications">Applications</a>
-        <a href="/" target="_blank">View site</a>
-        <a href="/admin/logout">Logout</a>
-      </nav>
-    </div>
-  </header>
-  <main class="admin-main">
+<body class="admin-body<%= typeof layoutNoHeader !== 'undefined' && layoutNoHeader ? ' admin-body--login' : '' %>">
+<% if (typeof layoutNoHeader !== 'undefined' && layoutNoHeader) { %>
+  <main class="admin-main admin-main--full">
     <%- body %>
   </main>
-  <script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
+<% } else { %>
+  <div class="admin-wrap">
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar__logo">
+        <span class="admin-sidebar__logo-icon"></span>
+        <span class="admin-sidebar__logo-text">BridgeDegree</span>
+      </div>
+      <p class="admin-sidebar__nav-label">Navigation</p>
+      <nav class="admin-sidebar__nav">
+        <a href="/admin" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'dashboard' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="layout-dashboard" class="admin-sidebar__icon"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="/admin/blog" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'blog' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="file-text" class="admin-sidebar__icon"></i>
+          <span>Blog</span>
+        </a>
+        <a href="/admin/testimonials" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'testimonials' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="message-square-quote" class="admin-sidebar__icon"></i>
+          <span>Testimonials</span>
+        </a>
+        <a href="/admin/applications" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'applications' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="users" class="admin-sidebar__icon"></i>
+          <span>Applications</span>
+        </a>
+        <div class="admin-sidebar__divider"></div>
+        <a href="/" target="_blank" class="admin-sidebar__link">
+          <i data-lucide="external-link" class="admin-sidebar__icon"></i>
+          <span>View site</span>
+        </a>
+        <a href="/admin/logout" class="admin-sidebar__link">
+          <i data-lucide="log-out" class="admin-sidebar__icon"></i>
+          <span>Logout</span>
+        </a>
+      </nav>
+    </aside>
+    <div class="admin-right">
+      <header class="admin-topbar">
+        <div class="admin-topbar__left">
+          <span class="admin-topbar__logo-icon"></span>
+          <span class="admin-topbar__logo-text">BridgeDegree Admin</span>
+        </div>
+        <div class="admin-topbar__search">
+          <i data-lucide="search" class="admin-topbar__search-icon"></i>
+          <input type="text" placeholder="Search..." class="admin-topbar__search-input" aria-label="Search">
+        </div>
+        <div class="admin-topbar__right">
+          <button type="button" class="admin-topbar__icon-btn" aria-label="Full screen"><i data-lucide="maximize-2"></i></button>
+          <a href="/admin" class="admin-topbar__icon-btn" aria-label="Dashboard"><i data-lucide="layout-dashboard"></i></a>
+          <div class="admin-topbar__user">
+            <span class="admin-topbar__avatar"><i data-lucide="user"></i></span>
+            <span class="admin-topbar__name">Admin</span>
+            <i data-lucide="chevron-down" class="admin-topbar__chevron"></i>
+          </div>
+        </div>
+      </header>
+      <main class="admin-main">
+        <%- body %>
+      </main>
+    </div>
+  </div>
+<% } %>
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
 </body>
 </html>
