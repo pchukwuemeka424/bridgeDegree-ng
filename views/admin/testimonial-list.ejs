@@ -1,0 +1,37 @@
+<h1 class="admin-page-title">Testimonials</h1>
+<p style="margin-bottom: 20px;"><a href="/admin/testimonials/new" class="admin-btn admin-btn-primary">New testimonial</a> <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a></p>
+
+<div class="admin-card">
+  <% if (testimonials && testimonials.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Role</th>
+        <th>Featured</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% testimonials.forEach(function(t) { %>
+      <tr>
+        <td><%= t.name %><% if (t.location) { %> <span style="color: var(--text-muted); font-size: 0.9rem;">— <%= t.location %></span><% } %></td>
+        <td><%= t.role || '' %></td>
+        <td><span class="admin-badge <%= t.featured ? 'admin-badge-published' : 'admin-badge-draft' %>"><%= t.featured ? 'Yes' : 'No' %></span></td>
+        <td><%= t.createdAt ? new Date(t.createdAt).toLocaleDateString() : '' %></td>
+        <td class="actions">
+          <a href="/admin/testimonials/<%= t._id %>/edit" class="admin-btn admin-btn-secondary">Edit</a>
+          <form method="post" action="/admin/testimonials/<%= t._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this testimonial?');">
+            <button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p>No testimonials yet. <a href="/admin/testimonials/new">Create your first testimonial</a>.</p>
+  <% } %>
+</div>
+

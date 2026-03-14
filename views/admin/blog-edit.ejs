@@ -1,0 +1,29 @@
+<h1 class="admin-page-title"><%= post ? 'Edit post' : 'New post' %></h1>
+<p style="margin-bottom: 20px;"><a href="/admin/blog" class="admin-btn admin-btn-secondary">Back to blog</a></p>
+<div class="admin-card">
+  <form method="post" action="<%= post ? '/admin/blog/' + post._id : '/admin/blog' %>" enctype="multipart/form-data">
+    <div class="admin-form-group">
+      <label for="title">Title *</label>
+      <input type="text" id="title" name="title" required value="<%= post ? (post.title || '') : '' %>">
+    </div>
+    <div class="admin-form-group">
+      <label for="excerpt">Excerpt (short summary)</label>
+      <textarea id="excerpt" name="excerpt" placeholder="Optional"><%= post ? (post.excerpt || '') : '' %></textarea>
+    </div>
+    <div class="admin-form-group">
+      <label for="content">Content *</label>
+      <textarea id="content" name="content" required style="min-height: 280px;"><%= post ? (post.content || '') : '' %></textarea>
+    </div>
+    <div class="admin-form-group">
+      <label for="image">Image</label>
+      <% if (post && post.image) { %>
+      <p style="margin-bottom: 8px;"><img src="<%= post.image %>" alt="" style="max-width: 200px; height: auto; border-radius: 8px;"></p>
+      <% } %>
+      <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp">
+    </div>
+    <div class="admin-form-group">
+      <label><input type="checkbox" name="published" <%= (post && post.published) || !post ? 'checked' : '' %>> Published</label>
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary"><%= post ? 'Update' : 'Create' %> post</button>
+  </form>
+</div>

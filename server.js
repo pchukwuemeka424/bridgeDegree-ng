@@ -1,9 +1,19 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
+const session = require('express-session');
+const { connectDB } = require('./config/db');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'bridgedegree-admin-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: process.env.NODE_ENV === 'production', httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+}));
 
 // Routes config for nav/footer (reusable across components)
 const routes = {
@@ -16,6 +26,7 @@ const routes = {
   blog: { path: '/blog', title: 'Blog' },
   faq: { path: '/faq', title: 'FAQ' },
   contact: { path: '/contact', title: 'Contact' },
+  career_passport: { path: '/career-passport', title: 'Career Passport' },
 };
 
 const quickLinks = [
@@ -60,6 +71,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
 app.use(expressLayouts);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use('/images', express.static(path.join(__dirname, 'static', 'images')));
 app.use(express.urlencoded({ extended: true }));
 
@@ -73,15 +85,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/', (req, res) => {
-  res.locals.currentRoute = 'index';
-  res.render('index', {
-    title: 'BridgeDegree',
-    stylesheet: 'home',
-    metaDescription: 'Nigeria\'s career infrastructure for university students. Get verified work experience, publish your research, and build a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
-  });
-});
-
 app.get('/students', (req, res) => {
   res.locals.currentRoute = 'students';
   res.render('onboarding-students', {
@@ -90,12 +93,102 @@ app.get('/students', (req, res) => {
   });
 });
 
+const adminRoutes = require('./routes/admin');
+const studentRoutes = require('./routes/student');
+const StudentApplication = require('./models/StudentApplication');
+const BlogPost = require('./models/BlogPost');
+const Testimonial = require('./models/Testimonial');
+
+let dbReadyPromise = null;
+function ensureDb() {
+  if (!dbReadyPromise) {
+    dbReadyPromise = connectDB().catch((err) => {
+      dbReadyPromise = null;
+      throw err;
+    });
+  }
+  return dbReadyPromise;
+}
+
+// Ensure DB connection for serverless/runtime environments
+app.use((req, res, next) => {
+  ensureDb().then(() => next()).catch((err) => {
+    console.error('DB connection error:', err);
+    next();
+  });
+});
+
+app.get('/', async (req, res) => {
+  res.locals.currentRoute = 'index';
+  let homePosts = [];
+  let testimonials = [];
+  try {
+    homePosts = await BlogPost.find({ published: true }).sort({ createdAt: -1 }).limit(2).lean();
+    testimonials = await Testimonial.find({ featured: true }).sort({ createdAt: -1 }).limit(6).lean();
+  } catch (err) {
+    console.error(err);
+  }
+  res.render('index', {
+    title: 'BridgeDegree',
+    stylesheet: 'home',
+    metaDescription: 'Nigeria\'s career infrastructure for university students. Get verified work experience, publish your research, and build a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
+    homePosts,
+    testimonials,
+  });
+});
+
+app.use('/admin', adminRoutes);
+app.use('/student', studentRoutes);
+
 app.get('/students/apply', (req, res) => {
   res.locals.currentRoute = 'students_apply';
+  res.locals.breadcrumbDark = true;
   res.render('students-apply', {
     title: 'Apply',
     breadcrumb: [{ path: '/', label: 'Home' }, { path: '/students', label: 'Students' }, { label: 'Apply' }],
     metaDescription: 'Apply to BridgeDegree — Nigeria\'s career infrastructure for undergraduates. Student job placement, internship placement, and academic publication support.',
+    error: !!req.query.error,
+  });
+});
+
+app.post('/students/apply', async (req, res) => {
+  const b = req.body || {};
+  const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
+  try {
+    const doc = await StudentApplication.create({
+      firstname: b.firstname,
+      lastname: b.lastname,
+      email: (b.email || '').trim().toLowerCase(),
+      university: b.university,
+      level: b.level,
+      department: b.department,
+      career_goal: b.career_goal || '',
+      hear_about: b.hear_about || '',
+      career_fields: toArray(b.career_fields),
+      work_experience_type: toArray(b.work_experience_type),
+      work_experience: b.work_experience || '',
+      skills: toArray(b.skills),
+      skills_other: b.skills_other || '',
+      long_term_goals: toArray(b.long_term_goals),
+      publish_research: b.publish_research || '',
+      final_year_project: b.final_year_project || '',
+      consent: b.consent === 'on' || b.consent === true,
+    });
+    return res.redirect('/students/apply/success?applicationId=' + encodeURIComponent(doc.applicationId) + '&email=' + encodeURIComponent(doc.email));
+  } catch (err) {
+    console.error('Application submit error:', err);
+    return res.redirect('/students/apply?error=1');
+  }
+});
+
+app.get('/students/apply/success', (req, res) => {
+  const applicationId = req.query.applicationId || '';
+  res.locals.currentRoute = 'students_apply';
+  res.locals.breadcrumbDark = true;
+  res.render('students-apply-success', {
+    title: 'Application received',
+    breadcrumb: [{ path: '/', label: 'Home' }, { path: '/students', label: 'Students' }, { label: 'Apply' }, { label: 'Success' }],
+    applicationId,
   });
 });
 
@@ -126,13 +219,36 @@ app.get('/faq', (req, res) => {
   });
 });
 
-app.get('/blog', (req, res) => {
+app.get('/blog', async (req, res) => {
   res.locals.currentRoute = 'blog';
+  let posts = [];
+  try {
+    posts = await BlogPost.find({ published: true }).sort({ createdAt: -1 }).lean();
+  } catch (err) {
+    console.error(err);
+  }
   res.render('blog', {
     title: 'Blog',
     breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Blog' }],
     metaDescription: 'BridgeDegree blog: career tips for Nigerian students, graduate employment in Africa, internship placement, and study abroad after Nigerian university.',
+    posts,
   });
+});
+
+app.get('/blog/:slug', async (req, res) => {
+  try {
+    const post = await BlogPost.findOne({ slug: req.params.slug, published: true }).lean();
+    if (!post) return res.redirect('/blog');
+    res.locals.currentRoute = 'blog';
+    res.render('blog-single', {
+      title: post.title,
+      breadcrumb: [{ path: '/', label: 'Home' }, { path: '/blog', label: 'Blog' }, { label: post.title }],
+      metaDescription: post.excerpt || post.content.slice(0, 160),
+      post,
+    });
+  } catch (err) {
+    res.redirect('/blog');
+  }
 });
 
 app.get('/contact', (req, res) => {
@@ -154,6 +270,15 @@ app.get('/about', (req, res) => {
   });
 });
 
+app.get('/career-passport', (req, res) => {
+  res.locals.currentRoute = 'career_passport';
+  res.render('career-passport', {
+    title: 'Career Passport',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Career Passport' }],
+    metaDescription: 'Career Passport — your verified work history, published research, and global pathway in one employer-ready profile. BridgeDegree.',
+  });
+});
+
 app.get('/policy', (req, res) => {
   res.locals.currentRoute = 'policy';
   res.render('policy', {
@@ -163,10 +288,16 @@ app.get('/policy', (req, res) => {
   });
 });
 
-// Export for Vercel serverless; listen only when run directly
 module.exports = app;
 if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`BridgeDegree running at http://localhost:${PORT}`);
-  });
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`BridgeDegree running at http://localhost:${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 }

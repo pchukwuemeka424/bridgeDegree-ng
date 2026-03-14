@@ -1,0 +1,23 @@
+<h1 class="admin-page-title">Dashboard</h1>
+<div class="admin-stats">
+  <div class="admin-stat">
+    <div class="num"><%= postCount %></div>
+    <div class="label">Blog posts</div>
+  </div>
+  <div class="admin-stat">
+    <div class="num"><%= typeof testimonialCount !== 'undefined' ? testimonialCount : 0 %></div>
+    <div class="label">Testimonials</div>
+  </div>
+  <div class="admin-stat">
+    <div class="num"><%= applicationCount %></div>
+    <div class="label">Student applications</div>
+  </div>
+</div>
+<div class="admin-card">
+  <h2>Quick actions</h2>
+  <a href="/admin/blog/new" class="admin-btn admin-btn-primary">New blog post</a>
+  <a href="/admin/blog" class="admin-btn admin-btn-secondary" style="margin-left: 8px;">Manage blog</a>
+  <a href="/admin/testimonials/new" class="admin-btn admin-btn-secondary" style="margin-left: 8px;">New testimonial</a>
+  <a href="/admin/testimonials" class="admin-btn admin-btn-secondary" style="margin-left: 8px;">Manage testimonials</a>
+  <a href="/admin/applications" class="admin-btn admin-btn-secondary" style="margin-left: 8px;">View applications</a>
+</div>

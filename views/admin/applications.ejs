@@ -1,0 +1,46 @@
+<h1 class="admin-page-title">Student applications</h1>
+<p style="margin-bottom: 20px;"><a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a></p>
+<div class="admin-card">
+  <% if (applications && applications.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>University</th>
+        <th>Level</th>
+        <th>Status</th>
+        <th>Submitted</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% applications.forEach(function(a) { %>
+      <tr>
+        <td><%= a.applicationId %></td>
+        <td><%= a.firstname %> <%= a.lastname %></td>
+        <td><%= a.email %></td>
+        <td><%= a.university %></td>
+        <td><%= a.level %></td>
+        <td>
+          <form method="post" action="/admin/applications/<%= a._id %>/status" style="display:inline;">
+            <select name="status" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 6px;">
+              <option value="submitted" <%= a.status === 'submitted' ? 'selected' : '' %>>Submitted</option>
+              <option value="under_review" <%= a.status === 'under_review' ? 'selected' : '' %>>Under review</option>
+              <option value="shortlisted" <%= a.status === 'shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+              <option value="accepted" <%= a.status === 'accepted' ? 'selected' : '' %>>Accepted</option>
+              <option value="rejected" <%= a.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+            </select>
+          </form>
+        </td>
+        <td><%= a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : '' %></td>
+        <td><a href="/student/dashboard?email=<%= encodeURIComponent(a.email) %>&applicationId=<%= encodeURIComponent(a.applicationId) %>" target="_blank" class="admin-btn admin-btn-secondary">View</a></td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p>No applications yet.</p>
+  <% } %>
+</div>

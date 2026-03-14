@@ -60,12 +60,140 @@
 .testimonials-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
 .testimonials-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.85rem, 2.5vw, 2.25rem); font-weight: 400; text-align: center; margin-bottom: 8px; color: var(--text); }
 .testimonials-subtitle { text-align: center; font-size: 1.05rem; color: var(--text-muted); margin-bottom: 40px; }
-.testimonial-carousel-wrap { overflow: hidden; }
-.testimonial-carousel { display: flex; gap: 24px; animation: testimonial-scroll 40s linear infinite; }
-.testimonial-card { flex: 0 0 380px; background: var(--surface); padding: 32px 28px; border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); }
+.testimonial-slider { position: relative; }
+.testimonial-viewport {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+.testimonial-viewport::-webkit-scrollbar { display: none; }
+.testimonial-track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(320px, 380px);
+  gap: 24px;
+  padding: 0 56px;
+  align-items: stretch;
+}
+.testimonial-card {
+  scroll-snap-align: start;
+  background: var(--surface);
+  padding: 32px 28px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
 .testimonial-card blockquote { font-size: 1.05rem; color: var(--text); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
 .testimonial-card cite { font-size: 0.9rem; color: var(--text-muted); }
-@keyframes testimonial-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+.t-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--accent-green);
+  transition: transform 0.15s ease, background 0.2s ease, opacity 0.2s ease;
+}
+.t-nav:hover { background: #fff; transform: translateY(-50%) scale(1.03); }
+.t-nav:disabled { opacity: 0.4; cursor: default; }
+.t-prev { left: 0; }
+.t-next { right: 0; }
+.t-nav .lucide { width: 20px; height: 20px; }
+
+@media (max-width: 900px) {
+  .testimonial-track { padding: 0 44px; grid-auto-columns: minmax(280px, 340px); }
+}
+@media (max-width: 600px) {
+  .testimonial-track { padding: 0 18px; grid-auto-columns: 86vw; }
+  .t-nav { display: none; }
+}
 .cta-wrap { display: flex; justify-content: flex-end; margin-top: 24px; }
+/* BridgeDegree After */
+.after-section { padding: 80px 0; background: var(--header-dark); color: #fff; border-top: 1px solid var(--border); }
+.after-inner { max-width: 800px; margin: 0 auto; padding: 0 32px; }
+.after-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; margin-bottom: 12px; color: #fff; }
+.after-tagline { font-size: 1.35rem; font-weight: 600; color: var(--accent-orange-soft); margin-bottom: 20px; }
+.after-desc { font-size: 1.05rem; color: rgba(255,255,255,0.92); line-height: 1.7; margin-bottom: 20px; }
+.after-built { font-size: 0.95rem; color: rgba(255,255,255,0.8); font-style: italic; margin-bottom: 28px; }
+.after-cta { background: var(--accent-green); color: var(--surface); }
+.after-cta:hover { background: var(--accent-green-bright); color: var(--surface); }
+
+/* After modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; visibility: hidden; transition: opacity 0.25s, visibility 0.25s; }
+.modal-overlay.modal-open { opacity: 1; visibility: visible; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.modal-box { position: relative; max-width: 640px; max-height: 85vh; overflow-y: auto; background: var(--surface); border-radius: var(--radius); padding: 40px 36px; box-shadow: 0 24px 48px rgba(0,0,0,0.2); border: 1px solid var(--border); }
+.modal-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; color: var(--text); transition: background 0.2s; }
+.modal-close:hover { background: var(--accent-orange-soft); color: var(--accent-orange); }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.35rem, 2vw, 1.75rem); font-weight: 400; color: var(--text); margin-bottom: 16px; padding-right: 44px; }
+.modal-intro { font-size: 1rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 24px; }
+.modal-subtitle { font-size: 1.1rem; font-weight: 700; color: var(--accent-green); margin-bottom: 8px; }
+.modal-lead { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+.modal-p { font-size: 0.95rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 16px; }
+.modal-list { margin: 16px 0 0; padding-left: 24px; }
+.modal-list li { font-size: 0.95rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 8px; }
+
+/* Career Passport block */
+.career-passport-section { padding: 64px 0; background: var(--surface-2); border-top: 1px solid var(--border); }
+.career-passport-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.career-passport-wrap { display: grid; grid-template-columns: 1fr 340px; gap: 48px; align-items: start; }
+.career-passport-content { }
+.career-passport-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; color: var(--text); margin-bottom: 12px; }
+.career-passport-desc { font-size: 1.05rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+.career-passport-more { font-size: 0.98rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 20px; }
+.career-passport-list { list-style: none; margin: 0 0 24px 0; padding: 0; }
+.career-passport-list li { font-size: 0.95rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 8px; padding-left: 20px; position: relative; }
+.career-passport-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-green); font-weight: 700; }
+.career-passport-cta { display: inline-flex; }
+/* Sample Career Passport card (homepage) */
+.career-passport-section .cp-sample { position: sticky; top: 100px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-hover); overflow: hidden; }
+.career-passport-section .cp-sample-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); padding: 12px 18px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+.career-passport-section .cp-sample-inner { padding: 22px 18px; }
+.career-passport-section .cp-sample-header { display: flex; gap: 14px; margin-bottom: 16px; }
+.career-passport-section .cp-sample-avatar { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.career-passport-section .cp-sample-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.career-passport-section .cp-sample-name { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.career-passport-section .cp-sample-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 4px; }
+.career-passport-section .cp-sample-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.career-passport-section .cp-sample-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 0.7rem; font-weight: 600; color: var(--accent-green); background: var(--accent-green-soft); padding: 5px 9px; border-radius: 100px; }
+.career-passport-section .cp-sample-badge i { width: 11px; height: 11px; }
+.career-passport-section .cp-sample-block { margin-bottom: 14px; }
+.career-passport-section .cp-sample-block:last-child { margin-bottom: 0; }
+.career-passport-section .cp-sample-block h4 { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+.career-passport-section .cp-sample-block p { font-size: 0.8rem; color: var(--text); line-height: 1.5; margin: 0; }
+.career-passport-section .cp-sample-block .item { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 3px; padding-left: 12px; position: relative; }
+.career-passport-section .cp-sample-block .item::before { content: '•'; position: absolute; left: 0; color: var(--accent-green); }
+
+/* Blog snippet */
+.blog-snippet-section { padding: 80px 0; background: var(--surface); }
+.blog-snippet-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.blog-snippet-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; text-align: center; margin-bottom: 8px; color: var(--text); }
+.blog-snippet-subtitle { text-align: center; font-size: 1.05rem; color: var(--text-muted); margin-bottom: 36px; }
+.blog-snippet-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 32px; }
+.blog-snippet-card { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: box-shadow 0.2s, transform 0.2s; }
+.blog-snippet-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+.blog-snippet-card a { text-decoration: none; color: inherit; display: block; }
+.blog-snippet-card .card-inner { padding: 28px 24px; }
+.blog-snippet-card .meta { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
+.blog-snippet-card .tag { color: var(--accent-green); font-weight: 600; }
+.blog-snippet-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; line-height: 1.35; color: var(--text); }
+.blog-snippet-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+.blog-snippet-cta { text-align: center; }
+
+@media (max-width: 768px) { .blog-snippet-grid { grid-template-columns: 1fr; } }
+
+@media (max-width: 900px) { .career-passport-wrap { grid-template-columns: 1fr; } .career-passport-section .cp-sample { position: static; max-width: 360px; margin: 0 auto; } }
+
 @media (max-width: 1024px) { .problem-wrap, .solution-wrap { grid-template-columns: 1fr; min-height: 0; } .problem-image, .solution-image { min-height: 360px; } .pub-grid { grid-template-columns: 1fr; } .pub-bottom { grid-template-columns: 1fr; } }
 @media (max-width: 768px) { .hero-inner { padding: 56px 20px 80px; } .problem-panel, .solution-panel { padding: 40px 24px; } .problem-cards, .solution-cards { grid-template-columns: 1fr; } .solution-image { display: none; } }

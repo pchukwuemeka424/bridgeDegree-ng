@@ -1,130 +1,598 @@
 <style>
-  .faq-hero { padding: 56px 0 40px; text-align: center; background: #244267; border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; }
-  .faq-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.85rem, 3vw, 2.35rem); font-weight: 400; margin-bottom: 12px; color: #fff; }
-  .faq-hero .subtitle { font-size: 1.05rem; color: rgba(255,255,255,0.92); }
-  .faq-section { margin-bottom: 48px; }
-  .faq-section h2 { font-size: 1.25rem; font-weight: 700; color: var(--accent-green); margin-bottom: 20px; padding-bottom: 8px; border-bottom: 2px solid var(--accent-green-soft); }
-  .faq-item { margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); }
-  .faq-item summary { padding: 18px 20px; font-weight: 600; font-size: 1rem; color: var(--text); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  /* FAQ page – modern layout */
+  .faq-page { --faq-nav-width: 220px; }
+  .faq-hero {
+    padding: 72px 0 56px;
+    text-align: center;
+    background: linear-gradient(165deg, var(--header-dark) 0%, #152a47 50%, #1e3a5f 100%);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .faq-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(26, 77, 62, 0.25) 0%, transparent 55%);
+    pointer-events: none;
+  }
+  .faq-hero .container { position: relative; z-index: 1; }
+  .faq-hero .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 20px;
+  }
+  .faq-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    font-weight: 400;
+    margin-bottom: 14px;
+    color: #fff;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .faq-hero .subtitle {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.85);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .faq-main { padding: 48px 0 80px; }
+  .faq-layout {
+    display: grid;
+    grid-template-columns: var(--faq-nav-width) 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+  .faq-nav {
+    position: sticky;
+    top: 100px;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px 0;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .faq-nav-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 0 20px 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .faq-nav a {
+    display: block;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s, background 0.2s;
+    border-left: 3px solid transparent;
+    margin-left: 0;
+  }
+  .faq-nav a:hover { color: var(--accent-green); background: var(--accent-green-soft); }
+  .faq-nav a.active {
+    color: var(--accent-green);
+    font-weight: 600;
+    background: var(--accent-green-soft);
+    border-left-color: var(--accent-green);
+  }
+  .faq-content { min-width: 0; }
+  .faq-section {
+    margin-bottom: 56px;
+    scroll-margin-top: 100px;
+  }
+  .faq-section:last-of-type { margin-bottom: 0; }
+  .faq-section-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .faq-section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-green-soft);
+    color: var(--accent-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .faq-section-icon svg { width: 22px; height: 22px; }
+  .faq-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    margin: 0;
+  }
+  .faq-list { display: flex; flex-direction: column; gap: 12px; }
+  .faq-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+  .faq-item:hover { border-color: rgba(26, 77, 62, 0.2); box-shadow: var(--shadow); }
+  .faq-item[open] { border-color: var(--accent-green-soft); box-shadow: 0 4px 20px rgba(26, 77, 62, 0.08); }
+  .faq-item summary {
+    padding: 20px 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text);
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    transition: background 0.2s;
+  }
   .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: ''; width: 20px; height: 20px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat; flex-shrink: 0; transition: transform 0.2s; }
+  .faq-item summary:hover { background: var(--surface-2); }
+  .faq-item summary::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%231a4d3e' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") center/contain no-repeat;
+    transition: transform 0.25s ease;
+  }
   .faq-item[open] summary::after { transform: rotate(180deg); }
-  .faq-item .faq-answer { padding: 0 20px 20px; font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; border-top: 1px solid var(--border); }
-  .faq-item .faq-answer p { margin-top: 16px; margin-bottom: 0; }
-  .faq-nav { position: sticky; top: 120px; }
-  .faq-nav a { display: block; padding: 8px 0; font-size: 0.9rem; color: var(--text-muted); text-decoration: none; }
-  .faq-nav a:hover { color: var(--accent-green); }
-  .faq-layout { display: grid; grid-template-columns: 200px 1fr; gap: 48px; }
-  @media (max-width: 900px) { .faq-layout { grid-template-columns: 1fr; } .faq-nav { position: static; } }
+  .faq-item .faq-answer {
+    padding: 0 24px 22px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .faq-item .faq-answer p { margin: 0 0 12px; }
+  .faq-item .faq-answer p:last-child { margin-bottom: 0; }
+  .faq-item .faq-answer ul {
+    margin: 12px 0 0 0;
+    padding-left: 1.35em;
+    list-style: none;
+  }
+  .faq-item .faq-answer ul li {
+    position: relative;
+    padding-left: 0.5em;
+    margin-bottom: 6px;
+  }
+  .faq-item .faq-answer ul li::before {
+    content: '';
+    position: absolute;
+    left: -1em;
+    top: 0.65em;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    opacity: 0.7;
+  }
+  .faq-cta {
+    background: linear-gradient(180deg, var(--surface-2) 0%, var(--bg) 100%);
+    padding: 56px 0;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+  .faq-cta p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 24px; }
+  .faq-cta .btn-primary { font-size: 1rem; padding: 14px 28px; }
+  @media (max-width: 960px) {
+    .faq-layout { grid-template-columns: 1fr; }
+    .faq-nav {
+      position: static;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 16px;
+    }
+    .faq-nav-title { width: 100%; padding: 0 0 10px; border: none; margin: 0 0 8px; }
+    .faq-nav a { padding: 10px 16px; border-radius: var(--radius-sm); border: none; margin: 0; }
+    .faq-nav a.active { border: none; background: var(--accent-green-soft); }
+  }
+  @media (max-width: 640px) {
+    .faq-hero { padding: 56px 0 44px; }
+    .faq-item summary { padding: 16px 18px; font-size: 0.95rem; }
+    .faq-item .faq-answer { padding: 0 18px 18px; }
+  }
 </style>
 
 <section class="faq-hero">
   <div class="container">
+    <span class="badge">FAQ</span>
     <h1>Frequently asked questions</h1>
     <p class="subtitle">Everything you need to know about BridgeDegree</p>
   </div>
 </section>
 
-<section class="page-section">
+<section class="faq-main page-section faq-page">
   <div class="container faq-layout">
-    <nav class="faq-nav">
-      <a href="#section-a">About BridgeDegree</a>
-      <a href="#section-b">About the Programme</a>
-      <a href="#section-c">Career Passport & Credentials</a>
-      <a href="#section-d">Practical Questions</a>
-      <a href="#section-e">For Parents</a>
+    <nav class="faq-nav" aria-label="FAQ sections">
+      <span class="faq-nav-title">Jump to</span>
+      <a href="#students-faqs">Students</a>
+      <a href="#after-faqs">BridgeDegree After</a>
+      <a href="#employer-faqs">Employers</a>
+      <a href="#university-faqs">Universities</a>
     </nav>
-    <div>
-      <div class="faq-section" id="section-a">
-        <h2>About BridgeDegree (Q1–Q5)</h2>
+    <div class="faq-content">
+      <div class="faq-section" id="students-faqs">
+        <div class="faq-section-head">
+          <span class="faq-section-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
+          <h2>Student FAQs</h2>
+        </div>
+        <div class="faq-list">
         <details class="faq-item">
-          <summary>What exactly is BridgeDegree — is it a course platform or a university?</summary>
-          <div class="faq-answer"><p>BridgeDegree is neither. It is Nigeria's first embedded career infrastructure platform. We do not teach courses or run bootcamps. We build the verified professional identity of Nigerian students — from their first day in university to their first day in a global career — through structured work experience, academic publication support, and a globally legible Career Passport.</p></div>
+          <summary>What is Career-Infrastructure-as-a-Service (CIaaS)?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree is Nigeria's first CIaaS platform, the missing operating system between a Nigerian university and the global economy. We provide a structured, verifiable, longitudinal programme that converts academic years into career leverage, from 100 Level through post-graduation.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>Who founded BridgeDegree and when was it launched?</summary>
-          <div class="faq-answer"><p>BridgeDegree was founded in Nigeria in 2026 with the founding insight that Nigerian graduates are systematically invisible to global employers — not because of lack of ability, but because the university system produces academic records and nothing else.</p></div>
+          <summary>When do I start?</summary>
+          <div class="faq-answer">
+            <p>We begin at the 100 Level (Foundation tier). Value compounds each year: a student who joins at 100 Level exits with programme years of structured capital-building; joining at the 400 Level still gets Launch benefits but without the same compounding effect.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>Is BridgeDegree affiliated with any Nigerian university?</summary>
-          <div class="faq-answer"><p>No. BridgeDegree operates independently of any university. We do not require institutional approval or affiliation. Individual lecturers and departmental staff at many universities recommend BridgeDegree to their students — but the platform is not a university product.</p></div>
+          <summary>Which universities currently partner with BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>We are actively onboarding partner universities across Nigeria. Reach out to bring BridgeDegree to your institution — we work with university management to embed the platform into the academic structure.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>Is BridgeDegree a registered and legitimate organisation?</summary>
-          <div class="faq-answer"><p>Yes. BridgeDegree is a registered platform operating in Nigeria with documented corporate partner agreements, a publicly visible approved journal whitelist, and a pilot cohort of named students with verified outcomes.</p></div>
+          <summary>Does this replace my SIWES or IT placement?</summary>
+          <div class="faq-answer">
+            <p>No. BridgeDegree complements your existing SIWES or Industrial Training placement. Our Experience Engine structures additional, longer-term verified work experience alongside your university requirements — giving you more depth and documentation than a standard placement alone.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Will my final-year project definitely get published?</summary>
+          <div class="faq-answer">
+            <p>Our Publication Pipeline works to make your research publication-ready and submits it to the appropriate journals. While no one can guarantee acceptance, we provide editing support, supervision guidance, and journal matching to give your work the strongest possible chance. Many students graduate with accepted or publication-ready papers.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Is BridgeDegree available for all courses of study?</summary>
+          <div class="faq-answer">
+            <p>Yes. Whether you study Engineering, Law, Medicine, Business, Sciences, Social Sciences, or Arts, BridgeDegree has pathways for your field. Placements, journal targets, and global mobility strategies are all tailored to your specific course.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Is my data secure with BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>Yes. We take student data privacy seriously. All data is handled in compliance with applicable data protection regulations. See our Privacy Policy for full details on how your personal information is stored and used.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Which universities can participate in BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree is designed to work across all Nigerian universities and tertiary institutions. The platform is institution-neutral, meaning students from any accredited university or polytechnic can participate.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What role do mentors play in the programme?</summary>
+          <div class="faq-answer">
+            <p>Every BridgeDegree student is matched with a programme mentor. Mentors provide guidance on:</p>
+            <ul>
+              <li>Career direction</li>
+              <li>Internship preparation</li>
+              <li>Professional development</li>
+              <li>Research and project work</li>
+              <li>Global career strategy</li>
+            </ul>
+            <p>Mentorship ensures students are guided throughout their academic journey.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What is a Career Passport?</summary>
+          <div class="faq-answer">
+            <p>Your Career Passport is your verified professional profile inside BridgeDegree. It records:</p>
+            <ul>
+              <li>Internships and work experience</li>
+              <li>Industry projects</li>
+              <li>Certifications and skills</li>
+              <li>Research publications</li>
+              <li>Mentor validations</li>
+              <li>Career achievements</li>
+            </ul>
+            <p>Unlike a CV, a Career Passport is verifiable and continuously updated throughout your journey.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does BridgeDegree help me get work experience?</summary>
+          <div class="faq-answer">
+            <p>Starting from 200 Level, BridgeDegree connects students with structured opportunities such as:</p>
+            <ul>
+              <li>Virtual internships</li>
+              <li>Corporate project briefs</li>
+              <li>Remote international work projects</li>
+              <li>Industry-aligned final year projects</li>
+            </ul>
+            <p>All work experience is documented and verified, ensuring graduates leave university with real professional history.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Does BridgeDegree guarantee a job?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree does not promise jobs. What we provide is career infrastructure that dramatically increases your employability by helping you build:</p>
+            <ul>
+              <li>Verifiable work experience</li>
+              <li>Professional networks</li>
+              <li>Industry-relevant skills</li>
+              <li>A strong career portfolio</li>
+            </ul>
+            <p>Employers hire candidates who demonstrate capability. BridgeDegree helps you prove that capability before graduation.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does BridgeDegree support students who want to study abroad?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree prepares students for global opportunities years before application season. Support includes:</p>
+            <ul>
+              <li>Scholarship strategy planning</li>
+              <li>Research publication support</li>
+              <li>Visa coaching</li>
+              <li>International CV preparation</li>
+              <li>Visa pathway guidance</li>
+              <li>Global career positioning</li>
+            </ul>
+            <p>This ensures students are admission-ready and scholarship-ready when the time comes.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Can BridgeDegree help me work remotely for international companies?</summary>
+          <div class="faq-answer">
+            <p>Yes. BridgeDegree prepares students for the global remote workforce by training them in:</p>
+            <ul>
+              <li>Remote collaboration tools</li>
+              <li>International workplace standards</li>
+              <li>Asynchronous communication</li>
+              <li>Cross-cultural teamwork</li>
+            </ul>
+            <p>Students may also participate in remote international projects that build credibility with global employers.</p>
+          </div>
         </details>
         <details class="faq-item">
           <summary>What does 'career infrastructure' mean?</summary>
-          <div class="faq-answer"><p>A coaching service gives you advice and skills. BridgeDegree gives you verifiable credentials. After BridgeDegree, you hold a blockchain-authenticated Career Passport containing 2+ years of documented work experience, at least one indexed publication, and a globally legible professional profile.</p></div>
-        </details>
-      </div>
-
-      <div class="faq-section" id="section-b">
-        <h2>About the Programme (Q6–Q12)</h2>
-        <details class="faq-item">
-          <summary>When should I join BridgeDegree — is 100 Level too early?</summary>
-          <div class="faq-answer"><p>100 Level is the ideal time to join. The earlier you enrol, the more years you have to build a verified work record before graduation. Your first internship placement begins at 200 Level.</p></div>
+          <div class="faq-answer">
+            <p>A coaching service gives you advice and skills. BridgeDegree gives you verifiable credentials. After BridgeDegree, you hold a blockchain-authenticated Career Passport containing 2+ years of documented work experience, at least one indexed publication, and a globally legible professional profile.</p>
+          </div>
         </details>
         <details class="faq-item">
           <summary>Can I join if I am in 400 or 500 Level?</summary>
-          <div class="faq-answer"><p>Yes. Final-year students can join and still benefit from the Publication Pipeline, Career Passport build, and employer placement support.</p></div>
+          <div class="faq-answer">
+            <p>Yes. Final-year students can join and still benefit from the Publication Pipeline, Career Passport build, and employer placement support.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>Are the internships real job placements?</summary>
-          <div class="faq-answer"><p>Yes. All internships are structured, performance-tracked placements with formal corporate partners who have signed placement commitments. Each placement has an assigned line manager or mentor and ends with a formal performance review authenticated to your Career Passport.</p></div>
+          <summary>Is BridgeDegree affiliated with any Nigerian university?</summary>
+          <div class="faq-answer">
+            <p>No. BridgeDegree operates independently of any university. We do not require institutional approval or affiliation. Individual lecturers and departmental staff at many universities recommend BridgeDegree to their students — but the platform is not a university product.</p>
+          </div>
         </details>
         <details class="faq-item">
           <summary>What is the Publication Pipeline?</summary>
-          <div class="faq-answer"><p>The Publication Pipeline supports the submission of your final-year project to an approved, indexed, peer-reviewed journal. Your existing final-year work is aligned to an industry brief, co-authored with a supervisor or expert, and prepared for submission.</p></div>
+          <div class="faq-answer">
+            <p>The Publication Pipeline supports the submission of your final-year project to an approved, indexed, peer-reviewed journal. Your existing final-year work is aligned to an industry brief, co-authored with a supervisor or expert, and prepared for submission. Also, you can co-author publications before your final year.</p>
+          </div>
         </details>
         <details class="faq-item">
           <summary>What is the Global Mobility Framework?</summary>
-          <div class="faq-answer"><p>The Global Mobility Framework is a premium add-on. It includes scholarship strategy, SOP development, international CV, ATS calibration, LinkedIn optimisation, NYSC integration, and post-graduation migration support.</p></div>
-        </details>
-      </div>
-
-      <div class="faq-section" id="section-c">
-        <h2>Career Passport & Credentials (Q13–Q16)</h2>
-        <details class="faq-item">
-          <summary>What is the Career Passport?</summary>
-          <div class="faq-answer"><p>The Career Passport is BridgeDegree's flagship credential — a single blockchain-authenticated document that aggregates everything you produce during the programme: internship records, performance reviews, publications, mentor validations, and certifications. It is permanently yours, globally legible, and verifiable by any employer anywhere in seconds.</p></div>
+          <div class="faq-answer">
+            <p>The Global Mobility Framework is a premium add-on. It includes scholarship strategy, SOP development, international CV, ATS calibration, study abroad support, LinkedIn optimisation, NYSC integration, and post-graduation migration support.</p>
+          </div>
         </details>
         <details class="faq-item">
           <summary>What does 'blockchain-credentialed' mean?</summary>
-          <div class="faq-answer"><p>Your credentials are recorded on a tamper-proof, decentralised digital ledger. Any employer can visit BridgeDegree's verification portal, enter your Passport reference, and instantly confirm the authenticity of your credentials. The record cannot be altered or faked.</p></div>
+          <div class="faq-answer">
+            <p>Your credentials are recorded on a tamper-proof, decentralised digital ledger. Any employer can visit BridgeDegree's verification portal, enter your Passport reference, and instantly confirm the authenticity of your credentials. The record cannot be altered or faked.</p>
+          </div>
         </details>
+        <details class="faq-item">
+          <summary>Does BridgeDegree guarantee internships?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree connects students with structured internship opportunities and industry projects through corporate partners. While placements depend on student readiness and performance, the platform is designed to increase access to real professional experience during university.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Does BridgeDegree guarantee jobs?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree does not promise jobs. Instead, it builds the career capital employers look for, including experience, skills, and documented achievements. Students who complete the programme are significantly more competitive in the job market.</p>
+          </div>
+        </details>
+        </div>
       </div>
 
-      <div class="faq-section" id="section-d">
-        <h2>Practical Questions (Q17–Q21)</h2>
+      <div class="faq-section" id="after-faqs">
+        <div class="faq-section-head">
+          <span class="faq-section-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <h2>BridgeDegree After FAQs</h2>
+        </div>
+        <div class="faq-list">
         <details class="faq-item">
-          <summary>How much does BridgeDegree cost?</summary>
-          <div class="faq-answer"><p>BridgeDegree is priced to reflect career transformation. Exact pricing is confirmed during the advisor consultation. Monthly, termly, and annual payment plans are available for all tiers.</p></div>
+          <summary>Can I join BridgeDegree After if I didn't use BridgeDegree during school?</summary>
+          <div class="faq-answer">
+            <p>Yes. BridgeDegree After is fully standalone. We'll conduct a career audit at onboarding, build or update your Career Passport from scratch, and get you moving within the first two months.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>Can my parents pay on my behalf — and are there instalment plans?</summary>
-          <div class="faq-answer"><p>Yes to both. Many BridgeDegree students are co-funded by their parents. Instalment plans — monthly or termly — are available for all tiers.</p></div>
+          <summary>Can I use BridgeDegree during NYSC?</summary>
+          <div class="faq-answer">
+            <p>Yes. BridgeDegree After is designed to work around your NYSC one year and alongside your service year. The programme helps you use the service year strategically by building:</p>
+            <ul>
+              <li>Verified work experience</li>
+              <li>Professional certifications</li>
+              <li>Research output</li>
+              <li>International job readiness</li>
+            </ul>
+            <p>Your service year becomes a launchpad, not a pause.</p>
+          </div>
         </details>
+        <details class="faq-item">
+          <summary>Is this programme GPA-sensitive?</summary>
+          <div class="faq-answer">
+            <p>No. BridgeDegree After is GPA-neutral. Your academic classification determines your strategy, not your eligibility. We work with:</p>
+            <ul>
+              <li>First Class graduates targeting scholarships and research</li>
+              <li>2:1 and 2:2 graduates building work-experience leverage</li>
+              <li>Third Class graduates transitioning into skill-based career tracks</li>
+              <li>HND / ND holders navigating global equivalency pathways</li>
+            </ul>
+            <p>Our goal is to convert any starting point into career leverage.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What happens after my subscription year ends?</summary>
+          <div class="faq-answer">
+            <p>Your Career Passport remains yours permanently. All documented outcomes stay on your verified record. Alumni access to the job board and network continues at a reduced annual fee.</p>
+          </div>
+        </details>
+        </div>
       </div>
 
-      <div class="faq-section" id="section-e">
-        <h2>For Parents (Q22–Q25)</h2>
+      <div class="faq-section" id="employer-faqs">
+        <div class="faq-section-head">
+          <span class="faq-section-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+          <h2>Employer / Recruiter FAQs</h2>
+        </div>
+        <div class="faq-list">
         <details class="faq-item">
-          <summary>As a parent, why should I invest in BridgeDegree for my child?</summary>
-          <div class="faq-answer"><p>The Nigerian university system produces graduates with degrees and nothing else. BridgeDegree builds verified work experience, published research, and a global profile during university — not after. The cost is an investment in an outcome: your child graduating with verifiable credentials that give them a real competitive edge.</p></div>
+          <summary>What is BridgeDegree for employers?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree is a verified talent pipeline connecting employers with students who already have:</p>
+            <p>Documented project experience<br />Internship exposure<br />Verified professional skills</p>
+            <p>This reduces hiring risk and onboarding time.</p>
+          </div>
         </details>
         <details class="faq-item">
-          <summary>How do I know BridgeDegree will deliver what it promises?</summary>
-          <div class="faq-answer"><p>We publish our outcomes. Named student case studies, employer-verified placements, publication submission confirmations, and employer endorsements are all available on our website. We encourage parents to review our case studies and speak with our advisory team before enrolling.</p></div>
+          <summary>How are student credentials verified?</summary>
+          <div class="faq-answer">
+            <p>Student achievements inside BridgeDegree are recorded and verified through the Career Passport system, which documents:</p>
+            <p>Work experience<br />Project deliverables<br />Mentor validations<br />Professional certifications</p>
+            <p>This provides credible proof of student capabilities.</p>
+          </div>
         </details>
+        <details class="faq-item">
+          <summary>How can companies partner with BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>Employers can partner with BridgeDegree by:</p>
+            <p>Hosting internships<br />Providing real industry project briefs<br />Recruiting from the student talent pool<br />Sponsoring career development programmes</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>What industries can recruit from BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree supports talent across many disciplines, including:</p>
+            <p>Technology<br />Finance<br />Engineering<br />Business<br />Health sciences<br />Research<br />Creative industries</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Why should companies recruit through BridgeDegree?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree students graduate with real work experience and documented projects, which means:</p>
+            <p>Faster onboarding<br />Lower training costs<br />Higher job readiness</p>
+            <p>Employers gain access to pre-vetted emerging talent.</p>
+          </div>
+        </details>
+        </div>
+      </div>
+
+      <div class="faq-section" id="university-faqs">
+        <div class="faq-section-head">
+          <span class="faq-section-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 7h8"/><path d="M8 11h8"/></svg></span>
+          <h2>University Partner FAQs</h2>
+        </div>
+        <div class="faq-list">
+        <details class="faq-item">
+          <summary>What is BridgeDegree for universities?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree acts as a career infrastructure layer that integrates with universities to help students build employability outcomes.</p>
+            <p>It supports universities by providing:</p>
+            <p>Industry partnerships<br />Career development infrastructure<br />Research collaboration opportunities<br />Verified graduate outcome data</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Does BridgeDegree replace university curriculum?</summary>
+          <div class="faq-answer">
+            <p>No. BridgeDegree complements existing university education by adding:</p>
+            <p>Career development programmes<br />Industry exposure<br />Professional mentorship<br />Internship pathways</p>
+            <p>It strengthens the industry relevance of university education.</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does BridgeDegree benefit lecturers?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree supports lecturers by:</p>
+            <p>Creating co-authorship opportunities for research<br />Aligning final-year projects with industry needs<br />Reducing administrative workload through digital tools<br />Increasing research visibility and output</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>How does BridgeDegree support university accreditation goals?</summary>
+          <div class="faq-answer">
+            <p>BridgeDegree provides structured evidence of industry-academic linkage, which many accreditation frameworks increasingly value.</p>
+            <p>This includes:</p>
+            <p>Documented internships<br />Industry-aligned projects<br />Graduate employability data</p>
+          </div>
+        </details>
+        <details class="faq-item">
+          <summary>Is BridgeDegree affiliated with any Nigerian university?</summary>
+          <div class="faq-answer">
+            <p>No. BridgeDegree operates independently of any university.</p>
+            <p>We do not require institutional approval or affiliation.</p>
+            <p>Individual lecturers and departmental staff at many universities recommend BridgeDegree to their students — but the platform is not a university product.</p>
+          </div>
+        </details>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="page-section" style="background: var(--surface-2); text-align: center;">
+<section class="faq-cta">
   <div class="container">
-    <p style="margin-bottom: 20px;">Ready to start your journey?</p>
-    <a href="/students" class="btn-primary">Start My Application <i data-lucide="arrow-right"></i></a>
+    <p>Ready to start your journey?</p>
+    <a href="/students" class="btn-primary">Start My Application <i data-lucide="arrow-right" class="lucide"></i></a>
   </div>
 </section>
+
+<script>
+(function() {
+  var nav = document.querySelector('.faq-nav');
+  if (!nav) return;
+  var links = nav.querySelectorAll('a[href^="#"]');
+  var sections = [];
+  links.forEach(function(a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) sections.push({ id: id, el: el, link: a });
+  });
+  function updateActive() {
+    var top = window.scrollY + 120;
+    var current = null;
+    sections.forEach(function(s) {
+      if (s.el.offsetTop <= top) current = s;
+    });
+    if (current) {
+      links.forEach(function(a) { a.classList.remove('active'); });
+      current.link.classList.add('active');
+    }
+  }
+  window.addEventListener('scroll', function() { requestAnimationFrame(updateActive); });
+  window.addEventListener('load', updateActive);
+  updateActive();
+})();
+</script>

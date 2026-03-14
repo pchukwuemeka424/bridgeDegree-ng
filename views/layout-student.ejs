@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Student Dashboard' %> | BridgeDegree</title>
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/site.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="admin-body">
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <a href="/" class="admin-logo">BridgeDegree</a>
+      <nav class="admin-nav">
+        <a href="/students">Students</a>
+        <a href="/students/apply">Apply</a>
+        <a href="/student/dashboard">My application</a>
+      </nav>
+    </div>
+  </header>
+  <main class="admin-main">
+    <%- body %>
+  </main>
+  <script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
+</body>
+</html>

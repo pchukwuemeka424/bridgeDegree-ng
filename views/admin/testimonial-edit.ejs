@@ -1,0 +1,28 @@
+<h1 class="admin-page-title"><%= testimonial ? 'Edit testimonial' : 'New testimonial' %></h1>
+<p style="margin-bottom: 20px;"><a href="/admin/testimonials" class="admin-btn admin-btn-secondary">Back to testimonials</a></p>
+
+<div class="admin-card">
+  <form method="post" action="<%= testimonial ? '/admin/testimonials/' + testimonial._id : '/admin/testimonials' %>">
+    <div class="admin-form-group">
+      <label for="name">Name *</label>
+      <input type="text" id="name" name="name" required value="<%= testimonial ? (testimonial.name || '') : '' %>">
+    </div>
+    <div class="admin-form-group">
+      <label for="role">Role / Relationship</label>
+      <input type="text" id="role" name="role" value="<%= testimonial ? (testimonial.role || '') : '' %>" placeholder="e.g. Student, Graduate, University Partner">
+    </div>
+    <div class="admin-form-group">
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" value="<%= testimonial ? (testimonial.location || '') : '' %>" placeholder="e.g. Lagos">
+    </div>
+    <div class="admin-form-group">
+      <label for="quote">Quote *</label>
+      <textarea id="quote" name="quote" required style="min-height: 160px;"><%= testimonial ? (testimonial.quote || '') : '' %></textarea>
+    </div>
+    <div class="admin-form-group">
+      <label><input type="checkbox" name="featured" <%= (testimonial && testimonial.featured) || !testimonial ? 'checked' : '' %>> Featured (show on homepage)</label>
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary"><%= testimonial ? 'Update' : 'Create' %> testimonial</button>
+  </form>
+</div>
+

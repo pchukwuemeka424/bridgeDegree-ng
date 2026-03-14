@@ -1,0 +1,89 @@
+<style>
+  .cp-hero { padding: 72px 0 56px; background: #244267; border-bottom: 1px solid rgba(255,255,255,0.1); color: #fff; }
+  .cp-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.85rem, 3.5vw, 2.5rem); font-weight: 400; color: #fff; margin-bottom: 16px; }
+  .cp-hero p { font-size: 1.1rem; color: rgba(255,255,255,0.92); max-width: 720px; line-height: 1.7; }
+  .cp-section { background: var(--surface-2); }
+  .cp-wrap { display: grid; grid-template-columns: 1fr 380px; gap: 48px; align-items: start; }
+  .cp-content h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 400; color: var(--text); margin-bottom: 16px; }
+  .cp-content p { font-size: 1rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 16px; }
+  .cp-list { list-style: none; margin: 24px 0; padding: 0; }
+  .cp-list li { padding-left: 24px; margin-bottom: 10px; position: relative; font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+  .cp-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent-green); font-weight: 700; }
+  /* Sample Career Passport card */
+  .cp-sample { position: sticky; top: 100px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-hover); overflow: hidden; }
+  .cp-sample-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); padding: 12px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); }
+  .cp-sample-inner { padding: 24px 20px; }
+  .cp-sample-header { display: flex; gap: 16px; margin-bottom: 20px; }
+  .cp-sample-avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; flex-shrink: 0; object-fit: cover; }
+  .cp-sample-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cp-sample-name { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .cp-sample-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+  .cp-sample-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .cp-sample-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 600; color: var(--accent-green); background: var(--accent-green-soft); padding: 6px 10px; border-radius: 100px; }
+  .cp-sample-badge i { width: 12px; height: 12px; }
+  .cp-sample-block { margin-bottom: 18px; }
+  .cp-sample-block:last-child { margin-bottom: 0; }
+  .cp-sample-block h4 { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+  .cp-sample-block p { font-size: 0.85rem; color: var(--text); line-height: 1.5; margin: 0; }
+  .cp-sample-block .item { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 4px; padding-left: 12px; position: relative; }
+  .cp-sample-block .item::before { content: '•'; position: absolute; left: 0; color: var(--accent-green); }
+  @media (max-width: 900px) { .cp-wrap { grid-template-columns: 1fr; } .cp-sample { position: static; max-width: 400px; margin: 0 auto; } }
+</style>
+
+<section class="cp-hero">
+  <div class="container">
+    <h1>Career Passport</h1>
+    <p>Your verified work history, published research, and global pathway — in one portable, employer-ready profile.</p>
+    <p>Everything BridgeDegree helps you build during university and after (including NYSC) is documented and verifiable in your Career Passport, so recruiters and institutions see proof, not just claims.</p>
+  </div>
+</section>
+
+<section class="page-section cp-section">
+  <div class="container">
+    <div class="cp-wrap">
+      <div class="cp-content">
+        <h2>What’s in your Career Passport</h2>
+        <p>BridgeDegree’s three engines — Work Experience, Publication Pipeline, and Global Mobility — feed directly into your Career Passport. Each output becomes a permanent, verifiable asset.</p>
+        <ul class="cp-list">
+          <li>Verified work experience and placements</li>
+          <li>Published research and final-year project conversion</li>
+          <li>Certifications and skills documentation</li>
+          <li>NYSC placement and post-placement outcomes (BridgeDegree After)</li>
+          <li>Study-abroad and postgraduate application support trail</li>
+        </ul>
+        <p>Built by Nigerians, for Nigerians — your Career Passport is designed to make you visible to employers and institutions locally and globally.</p>
+        <p><a href="/students/apply#apply" class="btn-learn">Get Started <i data-lucide="arrow-right"></i></a></p>
+      </div>
+      <div class="cp-sample">
+        <div class="cp-sample-label">Sample — Career Passport</div>
+        <div class="cp-sample-inner">
+          <div class="cp-sample-header">
+            <div class="cp-sample-avatar"><img src="/images/avatar-female.svg" alt=""></div>
+            <div>
+              <div class="cp-sample-name">Amina O.</div>
+              <div class="cp-sample-meta">Computer Science, 400 Level</div>
+              <div class="cp-sample-meta">University of Lagos</div>
+            </div>
+          </div>
+          <div class="cp-sample-badges">
+            <span class="cp-sample-badge"><i data-lucide="shield-check"></i> Verified</span>
+            <span class="cp-sample-badge"><i data-lucide="briefcase"></i> 2 placements</span>
+          </div>
+          <div class="cp-sample-block">
+            <h4>Work experience</h4>
+            <div class="item">Product Intern — Tech Co. (Verified)</div>
+            <div class="item">SIWES — Fintech (Verified)</div>
+          </div>
+          <div class="cp-sample-block">
+            <h4>Research</h4>
+            <p>1 publication: “Machine learning in fraud detection” — submitted to journal</p>
+          </div>
+          <div class="cp-sample-block">
+            <h4>Pathway</h4>
+            <p>Study-abroad applications in progress; Career Passport shared with 3 recruiters.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

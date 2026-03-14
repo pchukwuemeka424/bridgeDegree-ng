@@ -1,0 +1,33 @@
+<h1 class="admin-page-title">Student dashboard</h1>
+<p style="margin-bottom: 24px;">Enter the email and application ID you received after submitting your application to view your status.</p>
+
+<div class="admin-card" style="max-width: 480px;">
+  <% if (typeof error !== 'undefined' && error) { %>
+  <p class="admin-error"><%= error %></p>
+  <% } %>
+  <form method="post" action="/student/dashboard">
+    <div class="admin-form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required value="<%= application && application.email ? application.email : '' %>">
+    </div>
+    <div class="admin-form-group">
+      <label for="applicationId">Application ID</label>
+      <input type="text" id="applicationId" name="applicationId" required placeholder="e.g. BD-XXXX" value="<%= application && application.applicationId ? application.applicationId : '' %>">
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary">View application</button>
+  </form>
+</div>
+
+<% if (application) { %>
+<div class="admin-card" style="margin-top: 24px;">
+  <h2>Application status</h2>
+  <p><strong>Application ID:</strong> <%= application.applicationId %></p>
+  <p><strong>Name:</strong> <%= application.firstname %> <%= application.lastname %></p>
+  <p><strong>Email:</strong> <%= application.email %></p>
+  <p><strong>University:</strong> <%= application.university %></p>
+  <p><strong>Level:</strong> <%= application.level %></p>
+  <p><strong>Department:</strong> <%= application.department %></p>
+  <p><strong>Status:</strong> <span class="admin-badge admin-badge-<%= application.status %>"><%= application.status.replace('_', ' ') %></span></p>
+  <p><strong>Submitted:</strong> <%= application.submittedAt ? new Date(application.submittedAt).toLocaleString() : '' %></p>
+</div>
+<% } %>

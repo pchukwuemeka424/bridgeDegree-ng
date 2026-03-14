@@ -1,32 +1,195 @@
 <style>
-  .apply-page { padding: 40px 0 64px; }
-  .apply-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
-  .apply-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; margin: 0; }
-  .apply-hero a { display: inline-flex; align-items: center; gap: 6px; color: var(--accent-green); font-weight: 600; text-decoration: none; font-size: 0.95rem; }
-  .apply-hero a:hover { text-decoration: underline; }
+  .apply-page { padding: 32px 0 48px; background: #244267; color: rgba(255,255,255,0.95); }
+  .apply-hero { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 32px; }
+  .apply-hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; margin: 0; color: #fff; }
+  .apply-hero a { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); font-weight: 600; text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+  .apply-hero a:hover { color: #fff; }
   .apply-hero .lucide { width: 18px; height: 18px; }
-  .apply-two-col { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: start; max-width: 1100px; margin: 0 auto; }
-  .apply-info { position: sticky; top: 100px; }
-  .apply-info-card { background: linear-gradient(160deg, var(--header-dark) 0%, #2a4a6f 100%); color: var(--surface); padding: 32px; border-radius: var(--radius); }
-  .apply-info-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; color: var(--surface); }
-  .apply-info-card ul { list-style: none; }
-  .apply-info-card li { position: relative; padding-left: 24px; margin-bottom: 14px; font-size: 0.95rem; opacity: 0.95; line-height: 1.5; }
-  .apply-info-card li .lucide { position: absolute; left: 0; top: 2px; width: 18px; height: 18px; color: var(--accent-green-bright); }
-  .apply-info-card .contact-row { margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.2); }
-  .apply-info-card .contact-row a { color: var(--surface); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-  .apply-info-card .contact-row a:hover { text-decoration: underline; }
-  .apply-info-card .contact-row p { font-size: 0.85rem; opacity: 0.85; margin-top: 8px; }
-  .apply-info-card .time { font-size: 0.85rem; margin-top: 20px; opacity: 0.9; }
-  .form-card { background: var(--surface); padding: 40px; border-radius: var(--radius); box-shadow: 0 4px 24px rgba(0,0,0,0.08); border: 1px solid var(--border); }
-  .form-card h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 8px; }
-  .form-card .form-intro { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 28px; }
-  .form-card .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .form-card .form-checkbox { display: flex; align-items: flex-start; gap: 12px; }
-  .form-card .form-checkbox input { margin-top: 4px; width: auto; }
-  .form-card .btn-primary { width: 100%; justify-content: center; padding: 16px; font-size: 1rem; margin-top: 8px; }
-  .form-success { display: none; padding: 24px; background: var(--accent-green-soft); border-radius: var(--radius-sm); color: var(--accent-green); font-weight: 500; margin-top: 24px; border: 1px solid rgba(26, 77, 62, 0.2); }
+
+  /* Column 12 - full width form container */
+  .apply-wrap { width: 100%; }
+  .apply-form-card {
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Step progress */
+  .apply-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 24px 32px;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .apply-step {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .apply-step-dot {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s ease;
+  }
+  .apply-step.active .apply-step-dot {
+    background: var(--accent-green);
+    border-color: var(--accent-green);
+    color: var(--surface);
+  }
+  .apply-step.done .apply-step-dot {
+    background: var(--accent-green-soft);
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+  }
+  .apply-step-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: none; }
+  .apply-step.active .apply-step-label { color: var(--accent-green); display: block; }
+  .apply-step-connector {
+    width: 28px; height: 2px; background: var(--border); margin: 0 4px;
+  }
+  .apply-step.done + .apply-step-connector { background: var(--accent-green); }
+  @media (min-width: 600px) {
+    .apply-step-label { display: block; }
+    .apply-step.active .apply-step-label { display: block; }
+  }
+
+  /* Form header */
+  .apply-form-head { padding: 32px 40px 0; }
+  .apply-form-head h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; font-weight: 400; margin: 0 0 8px; color: var(--text); }
+  .apply-form-head .form-intro { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 0; }
+
+  /* Form body - one step visible */
+  .apply-form-body { padding: 28px 40px 40px; }
+  .apply-step-panel { display: none; animation: applyFade 0.3s ease; }
+  .apply-step-panel.active { display: block; }
+  @keyframes applyFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .apply-form-body .form-group { margin-bottom: 20px; }
+  .apply-form-body .form-group:last-child { margin-bottom: 0; }
+  .apply-form-body label { display: block; font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
+  .apply-form-body input[type="text"],
+  .apply-form-body input[type="email"],
+  .apply-form-body select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .apply-form-body input:focus,
+  .apply-form-body select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 3px rgba(26, 77, 62, 0.12);
+  }
+  .apply-form-body .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .apply-form-body .form-row .form-group { margin-bottom: 20px; }
+
+  .apply-form-body .form-section-title { font-size: 1rem; font-weight: 700; color: var(--text); margin: 24px 0 12px; padding-bottom: 8px; }
+  .apply-form-body .form-section-title:first-child { margin-top: 0; }
+  .apply-form-body .max-hint { font-size: 0.85rem; color: var(--text-muted); margin: -4px 0 12px; }
+
+  .apply-form-body .checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px 20px;
+  }
+  .apply-form-body .checkbox-grid label {
+    display: flex; align-items: center; gap: 12px;
+    font-weight: 400; cursor: pointer; font-size: 0.95rem;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .apply-form-body .checkbox-grid label:hover { border-color: var(--accent-green); background: var(--accent-green-soft); }
+  .apply-form-body .checkbox-grid input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: var(--accent-green); }
+  .apply-form-body .checkbox-grid input[type="checkbox"]:checked + span { font-weight: 500; }
+  .apply-form-body .radio-group { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+  .apply-form-body .radio-group label {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 400; cursor: pointer; font-size: 0.95rem;
+    padding: 10px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .apply-form-body .radio-group label:hover { border-color: var(--accent-green); background: var(--accent-green-soft); }
+  .apply-form-body .radio-group input[type="radio"] { width: 18px; height: 18px; margin: 0; accent-color: var(--accent-green); }
+  .apply-form-body .radio-group input[type="radio"]:checked + span { font-weight: 600; }
+  .apply-form-body .form-checkbox { display: flex; align-items: flex-start; gap: 12px; margin-top: 24px; }
+  .apply-form-body .form-checkbox input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--accent-green); }
+  .apply-form-body .form-checkbox label { margin-bottom: 0; font-weight: 500; }
+
+  /* Nav buttons */
+  .apply-form-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 40px 32px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .apply-form-footer .btn-prev {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 20px;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+  }
+  .apply-form-footer .btn-prev:hover { color: var(--accent-green); border-color: var(--accent-green); background: var(--accent-green-soft); }
+  .apply-form-footer .btn-prev.hidden { visibility: hidden; }
+  .apply-form-footer .btn-next,
+  .apply-form-footer .btn-submit {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 28px;
+    font-size: 0.95rem; font-weight: 600;
+    color: var(--surface);
+    background: var(--accent-green);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .apply-form-footer .btn-next:hover,
+  .apply-form-footer .btn-submit:hover { background: var(--accent-green-bright); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(26, 77, 62, 0.25); }
+  .apply-form-footer .btn-submit { padding: 14px 32px; font-size: 1rem; }
+  .apply-form-footer .step-indicator { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+  .form-success { display: none; padding: 32px 40px; text-align: center; }
   .form-success.show { display: block; }
-  @media (max-width: 900px) { .apply-two-col { grid-template-columns: 1fr; } .apply-info { position: static; } .form-card .form-row { grid-template-columns: 1fr; } }
+  .form-success-icon { width: 64px; height: 64px; margin: 0 auto 20px; background: var(--accent-green-soft); color: var(--accent-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .form-success-icon .lucide { width: 32px; height: 32px; }
+  .form-success h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 12px; color: var(--text); }
+  .form-success p { font-size: 1rem; color: var(--text-muted); line-height: 1.6; max-width: 420px; margin: 0 auto; }
+
+  @media (max-width: 768px) {
+    .apply-form-head, .apply-form-body { padding-left: 24px; padding-right: 24px; }
+    .apply-form-footer { padding: 20px 24px 28px; flex-wrap: wrap; }
+    .apply-form-body .form-row { grid-template-columns: 1fr; }
+    .apply-form-body .checkbox-grid { grid-template-columns: 1fr; }
+    .apply-steps { padding: 20px 16px; }
+    .apply-step-label { display: none !important; }
+  }
 </style>
 
 <section class="apply-page">
@@ -40,100 +203,196 @@
 
 <section class="page-section" style="padding-top: 0;" id="apply">
   <div class="container">
-    <div class="apply-two-col">
-      <div class="apply-info">
-        <div class="apply-info-card">
-          <h3>What happens next</h3>
-          <ul>
-            <li><i data-lucide="check-circle"></i> We review your application and match you to the right programme track.</li>
-            <li><i data-lucide="check-circle"></i> A BridgeDegree advisor will contact you within 48 hours to discuss your goals.</li>
-            <li><i data-lucide="check-circle"></i> You'll complete a short career assessment and receive your mentor assignment.</li>
-            <li><i data-lucide="check-circle"></i> Once enrolled, your Career Passport is created and your first placement pathway begins.</li>
-          </ul>
-          <div class="contact-row">
-            <a href="mailto:info@bridgedegree.com"><i data-lucide="mail"></i> info@bridgedegree.com</a>
-            <p>Questions? Email us anytime.</p>
-          </div>
-          <p class="time">Takes about 5 minutes to complete.</p>
+    <div class="apply-wrap">
+      <div class="apply-form-card">
+        <!-- Step progress -->
+        <div class="apply-steps">
+          <div class="apply-step active" data-step="1"><span class="apply-step-dot">1</span><span class="apply-step-label">Your details</span></div>
+          <span class="apply-step-connector"></span>
+          <div class="apply-step" data-step="2"><span class="apply-step-dot">2</span><span class="apply-step-label">Career</span></div>
+          <span class="apply-step-connector"></span>
+          <div class="apply-step" data-step="3"><span class="apply-step-dot">3</span><span class="apply-step-label">Skills</span></div>
+          <span class="apply-step-connector"></span>
+          <div class="apply-step" data-step="4"><span class="apply-step-dot">4</span><span class="apply-step-label">Goals</span></div>
+          <span class="apply-step-connector"></span>
+          <div class="apply-step" data-step="5"><span class="apply-step-dot">5</span><span class="apply-step-label">Research</span></div>
+          <span class="apply-step-connector"></span>
+          <div class="apply-step" data-step="6"><span class="apply-step-dot">6</span><span class="apply-step-label">Submit</span></div>
         </div>
-      </div>
 
-      <div class="form-card">
-        <h2>Apply now</h2>
-        <p class="form-intro">Fill in your details below. A BridgeDegree advisor will be in touch within 48 hours.</p>
-        <form id="studentForm" action="#" method="post">
-          <div class="form-row">
-            <div class="form-group">
-              <label for="firstname">First Name *</label>
-              <input type="text" id="firstname" name="firstname" required placeholder="e.g. Chioma">
+        <div class="apply-form-head">
+          <h2>Apply now</h2>
+          <p class="form-intro">Fill in your details below. A BridgeDegree advisor will be in touch within 48 hours.</p>
+          <% if (typeof error !== 'undefined' && error) { %><p class="form-error" style="color: #c45c26; font-weight: 600; margin-top: 8px;">Something went wrong. Please try again.</p><% } %>
+        </div>
+
+        <form id="studentForm" action="/students/apply" method="post">
+          <div class="apply-form-body">
+            <!-- Step 1: Your details -->
+            <div class="apply-step-panel active" data-panel="1">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstname">First Name *</label>
+                  <input type="text" id="firstname" name="firstname" required placeholder="e.g. Chioma">
+                </div>
+                <div class="form-group">
+                  <label for="lastname">Last Name *</label>
+                  <input type="text" id="lastname" name="lastname" required placeholder="e.g. Okonkwo">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com">
+              </div>
+              <div class="form-group">
+                <label for="university">University / Institution *</label>
+                <input type="text" id="university" name="university" required placeholder="Your university name">
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="level">Current Level *</label>
+                  <select id="level" name="level" required>
+                    <option value="">Select level</option>
+                    <option value="100L">100L</option>
+                    <option value="200L">200L</option>
+                    <option value="300L">300L</option>
+                    <option value="400L">400L</option>
+                    <option value="500L">500L</option>
+                    <option value="Postgraduate">Postgraduate</option>
+                    <option value="NYSC">NYSC Corps Member</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="department">Field of Study / Department *</label>
+                  <input type="text" id="department" name="department" required placeholder="e.g. Computer Science">
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="career_goal">Primary Career Goal</label>
+                <input type="text" id="career_goal" name="career_goal" placeholder="e.g. I want to work in tech in the UK within 2 years of graduation">
+              </div>
+              <div class="form-group">
+                <label for="hear_about">How did you hear about BridgeDegree?</label>
+                <select id="hear_about" name="hear_about">
+                  <option value="">Select</option>
+                  <option value="Lecturer">Lecturer</option>
+                  <option value="Friend">Friend</option>
+                  <option value="Social media">Social media</option>
+                  <option value="WhatsApp">WhatsApp</option>
+                  <option value="Search">Search</option>
+                  <option value="Parent">Parent</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
             </div>
-            <div class="form-group">
-              <label for="lastname">Last Name *</label>
-              <input type="text" id="lastname" name="lastname" required placeholder="e.g. Okonkwo">
+
+            <!-- Step 2: Career direction -->
+            <div class="apply-step-panel" data-panel="2">
+              <div class="form-section-title">Which career fields interest you the most? (Select up to 3)</div>
+              <p class="max-hint">Select up to 3 options.</p>
+              <div class="checkbox-grid" data-max="3">
+                <label><input type="checkbox" name="career_fields" value="Technology / Software"><span>Technology / Software</span></label>
+                <label><input type="checkbox" name="career_fields" value="Data & Artificial Intelligence"><span>Data & Artificial Intelligence</span></label>
+                <label><input type="checkbox" name="career_fields" value="Finance / FinTech"><span>Finance / FinTech</span></label>
+                <label><input type="checkbox" name="career_fields" value="Health & Life Sciences"><span>Health & Life Sciences</span></label>
+                <label><input type="checkbox" name="career_fields" value="Engineering"><span>Engineering</span></label>
+                <label><input type="checkbox" name="career_fields" value="Research & Academia"><span>Research & Academia</span></label>
+                <label><input type="checkbox" name="career_fields" value="Business / Consulting"><span>Business / Consulting</span></label>
+                <label><input type="checkbox" name="career_fields" value="Digital Marketing & Media"><span>Digital Marketing & Media</span></label>
+                <label><input type="checkbox" name="career_fields" value="Public Policy / Government"><span>Public Policy / Government</span></label>
+                <label><input type="checkbox" name="career_fields" value="Entrepreneurship"><span>Entrepreneurship</span></label>
+                <label><input type="checkbox" name="career_fields" value="Other"><span>Other</span></label>
+              </div>
+              <div class="form-section-title" style="margin-top: 28px;">What type of work experience are you most interested in?</div>
+              <div class="checkbox-grid">
+                <label><input type="checkbox" name="work_experience_type" value="Remote internships"><span>Remote internships</span></label>
+                <label><input type="checkbox" name="work_experience_type" value="Local company internships"><span>Local company internships</span></label>
+                <label><input type="checkbox" name="work_experience_type" value="International remote projects"><span>International remote projects</span></label>
+                <label><input type="checkbox" name="work_experience_type" value="Research & academic publishing"><span>Research & academic publishing</span></label>
+                <label><input type="checkbox" name="work_experience_type" value="Startup building"><span>Startup building</span></label>
+                <label><input type="checkbox" name="work_experience_type" value="NGO / social impact work"><span>NGO / social impact work</span></label>
+              </div>
+            </div>
+
+            <!-- Step 3: Skills & experience -->
+            <div class="apply-step-panel" data-panel="3">
+              <div class="form-section-title">Do you currently have any work experience or internships?</div>
+              <div class="radio-group">
+                <label><input type="radio" name="work_experience" value="None" required><span>None</span></label>
+                <label><input type="radio" name="work_experience" value="Less than 3 months"><span>Less than 3 months</span></label>
+                <label><input type="radio" name="work_experience" value="3–12 months"><span>3–12 months</span></label>
+                <label><input type="radio" name="work_experience" value="More than 1 year"><span>More than 1 year</span></label>
+              </div>
+              <div class="form-section-title" style="margin-top: 28px;">Which skills do you currently have? (Select all that apply)</div>
+              <div class="checkbox-grid">
+                <label><input type="checkbox" name="skills" value="Data Analysis"><span>Data Analysis</span></label>
+                <label><input type="checkbox" name="skills" value="Programming / Software Development"><span>Programming / Software Development</span></label>
+                <label><input type="checkbox" name="skills" value="Writing & Research"><span>Writing & Research</span></label>
+                <label><input type="checkbox" name="skills" value="Digital Marketing"><span>Digital Marketing</span></label>
+                <label><input type="checkbox" name="skills" value="Product Management"><span>Product Management</span></label>
+                <label><input type="checkbox" name="skills" value="Design / Creative"><span>Design / Creative</span></label>
+                <label><input type="checkbox" name="skills" value="Business & Finance"><span>Business & Finance</span></label>
+                <label><input type="checkbox" name="skills" value="Communication / Leadership"><span>Communication / Leadership</span></label>
+                <label><input type="checkbox" name="skills" value="Other"><span>Other (Specify)</span></label>
+              </div>
+              <div class="form-group" id="skillsOtherWrap" style="display: none; margin-top: 16px;">
+                <label for="skills_other">Other skills (specify)</label>
+                <input type="text" id="skills_other" name="skills_other" placeholder="Describe your other skills">
+              </div>
+            </div>
+
+            <!-- Step 4: Global pathway -->
+            <div class="apply-step-panel" data-panel="4">
+              <div class="form-section-title">What are your long-term goals?</div>
+              <div class="checkbox-grid">
+                <label><input type="checkbox" name="long_term_goals" value="Work in Nigeria"><span>Work in Nigeria</span></label>
+                <label><input type="checkbox" name="long_term_goals" value="Work remotely for international companies"><span>Work remotely for international companies</span></label>
+                <label><input type="checkbox" name="long_term_goals" value="Study abroad"><span>Study abroad</span></label>
+                <label><input type="checkbox" name="long_term_goals" value="Migrate through skilled work"><span>Migrate through skilled work</span></label>
+                <label><input type="checkbox" name="long_term_goals" value="Build a startup"><span>Build a startup</span></label>
+                <label><input type="checkbox" name="long_term_goals" value="Not sure yet"><span>Not sure yet</span></label>
+              </div>
+            </div>
+
+            <!-- Step 5: Research & innovation -->
+            <div class="apply-step-panel" data-panel="5">
+              <div class="form-section-title">Are you interested in publishing academic research?</div>
+              <div class="radio-group">
+                <label><input type="radio" name="publish_research" value="Yes"><span>Yes</span></label>
+                <label><input type="radio" name="publish_research" value="Maybe"><span>Maybe</span></label>
+                <label><input type="radio" name="publish_research" value="No"><span>No</span></label>
+              </div>
+              <div class="form-section-title" style="margin-top: 28px;">Would you like your final-year project aligned with an industry problem?</div>
+              <div class="radio-group">
+                <label><input type="radio" name="final_year_project" value="Yes"><span>Yes</span></label>
+                <label><input type="radio" name="final_year_project" value="No"><span>No</span></label>
+                <label><input type="radio" name="final_year_project" value="Not sure"><span>Not sure</span></label>
+              </div>
+            </div>
+
+            <!-- Step 6: Consent & submit -->
+            <div class="apply-step-panel" data-panel="6">
+              <div class="form-section-title">Almost there</div>
+              <p class="max-hint" style="margin-bottom: 20px;">Review your application and confirm below.</p>
+              <div class="form-group form-checkbox">
+                <input type="checkbox" id="consent" name="consent" required>
+                <label for="consent">I consent to be contacted by BridgeDegree *</label>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-            <label for="email">Email Address *</label>
-            <input type="email" id="email" name="email" required placeholder="you@example.com">
+
+          <div class="apply-form-footer" id="formFooter">
+            <button type="button" class="btn-prev" id="btnPrev" aria-label="Previous step">Previous</button>
+            <span class="step-indicator" id="stepIndicator">Step 1 of 6</span>
+            <button type="button" class="btn-next" id="btnNext">Next</button>
+            <button type="submit" class="btn-submit" id="btnSubmit" style="display: none;">Submit Application</button>
           </div>
-          <div class="form-group">
-            <label for="university">University / Institution *</label>
-            <input type="text" id="university" name="university" required placeholder="Your university name">
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="level">Current Level *</label>
-              <select id="level" name="level" required>
-                <option value="">Select level</option>
-                <option value="100L">100L</option>
-                <option value="200L">200L</option>
-                <option value="300L">300L</option>
-                <option value="400L">400L</option>
-                <option value="500L">500L</option>
-                <option value="Postgraduate">Postgraduate</option>
-                <option value="NYSC">NYSC Corps Member</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="department">Field of Study / Department *</label>
-              <input type="text" id="department" name="department" required placeholder="e.g. Computer Science">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="programme">Programme Interest *</label>
-            <select id="programme" name="programme" required>
-              <option value="">Select interest</option>
-              <option value="Core">Core</option>
-              <option value="Core + Global Mobility">Core + Global Mobility</option>
-              <option value="BridgeDegree After">BridgeDegree After</option>
-              <option value="Not sure">Not sure</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="career_goal">Primary Career Goal</label>
-            <input type="text" id="career_goal" name="career_goal" placeholder="e.g. I want to work in tech in the UK within 2 years of graduation">
-          </div>
-          <div class="form-group">
-            <label for="hear_about">How did you hear about BridgeDegree?</label>
-            <select id="hear_about" name="hear_about">
-              <option value="">Select</option>
-              <option value="Lecturer">Lecturer</option>
-              <option value="Friend">Friend</option>
-              <option value="Social media">Social media</option>
-              <option value="WhatsApp">WhatsApp</option>
-              <option value="Search">Search</option>
-              <option value="Parent">Parent</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-          <div class="form-group form-checkbox">
-            <input type="checkbox" id="consent" name="consent" required>
-            <label for="consent">I consent to be contacted by BridgeDegree *</label>
-          </div>
-          <button type="submit" class="btn-primary">Submit Application</button>
         </form>
+
         <div class="form-success" id="formSuccess">
-          Your application has been received. A BridgeDegree advisor will be in touch within 48 hours to discuss your programme track and next steps. Welcome to BridgeDegree.
+          <div class="form-success-icon"><i data-lucide="check"></i></div>
+          <h3>Application received</h3>
+          <p>Your application has been received. A BridgeDegree advisor will be in touch within 48 hours to discuss your programme track and next steps. Welcome to BridgeDegree.</p>
         </div>
       </div>
     </div>
@@ -141,9 +400,93 @@
 </section>
 
 <script>
-  document.getElementById('studentForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    this.style.display = 'none';
-    document.getElementById('formSuccess').classList.add('show');
+(function() {
+  var TOTAL_STEPS = 6;
+  var currentStep = 1;
+  var form = document.getElementById('studentForm');
+  var panels = form.querySelectorAll('.apply-step-panel');
+  var steps = document.querySelectorAll('.apply-step');
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+  var btnSubmit = document.getElementById('btnSubmit');
+  var stepIndicator = document.getElementById('stepIndicator');
+  var formFooter = document.getElementById('formFooter');
+  var careerFieldsContainer = form.querySelector('[data-max="3"]');
+  var skillsOtherCheck = form.querySelector('input[name="skills"][value="Other"]');
+  var skillsOtherWrap = document.getElementById('skillsOtherWrap');
+
+  function goToStep(step) {
+    step = Math.max(1, Math.min(TOTAL_STEPS, step));
+    currentStep = step;
+    panels.forEach(function(p) {
+      p.classList.toggle('active', parseInt(p.getAttribute('data-panel'), 10) === step);
+    });
+    steps.forEach(function(s) {
+      var n = parseInt(s.getAttribute('data-step'), 10);
+      s.classList.remove('active', 'done');
+      if (n === step) s.classList.add('active');
+      else if (n < step) s.classList.add('done');
+    });
+    stepIndicator.textContent = 'Step ' + step + ' of ' + TOTAL_STEPS;
+    btnPrev.classList.toggle('hidden', step === 1);
+    btnNext.style.display = step === TOTAL_STEPS ? 'none' : 'inline-flex';
+    btnSubmit.style.display = step === TOTAL_STEPS ? 'inline-flex' : 'none';
+  }
+
+  function validateStep(step) {
+    var panel = form.querySelector('.apply-step-panel[data-panel="' + step + '"]');
+    if (!panel) return true;
+    var required = panel.querySelectorAll('[required]');
+    var valid = true;
+    var seenNames = {};
+    required.forEach(function(el) {
+      if (el.type === 'radio') {
+        if (!seenNames[el.name]) {
+          seenNames[el.name] = true;
+          if (!panel.querySelector('input[name="' + el.name + '"]:checked')) valid = false;
+        }
+      } else if (el.type === 'checkbox') {
+        if (!el.checked) valid = false;
+      } else if (!el.value || !el.value.trim()) valid = false;
+    });
+    return valid;
+  }
+
+  btnPrev.addEventListener('click', function() { goToStep(currentStep - 1); });
+  btnNext.addEventListener('click', function() {
+    if (currentStep === 1 && !validateStep(1)) { form.reportValidity(); return; }
+    goToStep(currentStep + 1);
   });
+
+  steps.forEach(function(s) {
+    s.addEventListener('click', function() {
+      var n = parseInt(this.getAttribute('data-step'), 10);
+      if (n <= currentStep) goToStep(n);
+    });
+  });
+
+  if (careerFieldsContainer) {
+    careerFieldsContainer.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      cb.addEventListener('change', function() {
+        var checked = careerFieldsContainer.querySelectorAll('input[type="checkbox"]:checked');
+        if (checked.length > 3) this.checked = false;
+      });
+    });
+  }
+  if (skillsOtherCheck && skillsOtherWrap) {
+    skillsOtherCheck.addEventListener('change', function() {
+      skillsOtherWrap.style.display = this.checked ? 'block' : 'none';
+    });
+  }
+
+  form.addEventListener('submit', function(e) {
+    if (currentStep !== TOTAL_STEPS) {
+      e.preventDefault();
+      return;
+    }
+    // Allow form to submit to server (step 6)
+  });
+
+  goToStep(1);
+})();
 </script>
