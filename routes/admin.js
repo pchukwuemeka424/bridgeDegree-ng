@@ -1,12 +1,24 @@
 const express = require('express');
 const path = require('path');
 const router = express.Router();
+const { put: putBlob } = require('@vercel/blob');
 const Admin = require('../models/Admin');
 const BlogPost = require('../models/BlogPost');
 const StudentApplication = require('../models/StudentApplication');
 const Testimonial = require('../models/Testimonial');
 const { requireAdmin } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+
+async function getUploadedImageUrl(file) {
+  if (!file) return null;
+  if (process.env.BLOB_READ_WRITE_TOKEN && file.buffer) {
+    const ext = file.mimetype === 'image/png' ? 'png' : file.mimetype === 'image/gif' ? 'gif' : 'jpg';
+    const pathname = `blog/blog-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const blob = await putBlob(pathname, file.buffer, { access: 'public', contentType: file.mimetype, addRandomSuffix: true });
+    return blob.url;
+  }
+  return '/uploads/blog/' + file.filename;
+}
 
 router.get('/login', (req, res) => {
   if (req.session && req.session.adminId) {
@@ -94,7 +106,7 @@ router.post('/blog', upload.single('image'), async (req, res) => {
     if (!title || !content) {
       return res.redirect('/admin/blog/new?error=missing');
     }
-    const image = req.file ? '/uploads/blog/' + req.file.filename : null;
+    const image = await getUploadedImageUrl(req.file);
     await BlogPost.create({
       title,
       content,
@@ -133,7 +145,7 @@ router.post('/blog/:id', upload.single('image'), async (req, res) => {
     if (excerpt !== undefined) post.excerpt = excerpt;
     post.published = published === 'on' || published === '1';
     if (req.file) {
-      post.image = '/uploads/blog/' + req.file.filename;
+      post.image = await getUploadedImageUrl(req.file);
     }
     await post.save();
     res.redirect('/admin/blog');

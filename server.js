@@ -1,5 +1,6 @@
 require('dotenv').config();
 const path = require('path');
+const os = require('os');
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
@@ -71,6 +72,9 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
 app.use(expressLayouts);
 app.use(express.static(path.join(__dirname, 'public')));
+if (process.env.VERCEL === '1') {
+  app.use('/uploads', express.static(path.join(os.tmpdir(), 'uploads')));
+}
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 app.use('/images', express.static(path.join(__dirname, 'static', 'images')));
 app.use(express.urlencoded({ extended: true }));
