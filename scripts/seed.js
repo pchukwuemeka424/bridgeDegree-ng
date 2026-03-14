@@ -9,6 +9,7 @@ const Admin = require('../models/Admin');
 const BlogPost = require('../models/BlogPost');
 const StudentApplication = require('../models/StudentApplication');
 const Testimonial = require('../models/Testimonial');
+const Partner = require('../models/Partner');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bridgedegree';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@bridgedegree.com';
@@ -138,6 +139,12 @@ const sampleTestimonials = [
   },
 ];
 
+const samplePartners = [
+  { name: 'Partner 1', logo: '/images/p-1.png', link: '', order: 0, active: true },
+  { name: 'Partner 2', logo: '/images/p-2.jpeg', link: '', order: 1, active: true },
+  { name: 'Partner 3', logo: '/images/p-3.png', link: '', order: 2, active: true },
+];
+
 async function seed() {
   await mongoose.connect(MONGODB_URI);
   console.log('Connected to MongoDB\n');
@@ -186,6 +193,17 @@ async function seed() {
     }
   } else {
     console.log('Testimonials already exist (' + existingTestimonials + '), skipping.');
+  }
+
+  // Partners (home page carousel)
+  const existingPartners = await Partner.countDocuments();
+  if (existingPartners === 0) {
+    for (const p of samplePartners) {
+      await Partner.create(p);
+      console.log('Created partner:', p.name);
+    }
+  } else {
+    console.log('Partners already exist (' + existingPartners + '), skipping.');
   }
 
   console.log('\nSeed complete.');

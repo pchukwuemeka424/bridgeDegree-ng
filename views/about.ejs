@@ -217,7 +217,193 @@
   }
   .about-cta-btns .btn-secondary:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
 
+  /* By the numbers – stat grid */
+  .about-numbers {
+    padding: 72px 0;
+    background: var(--surface);
+  }
+  .about-numbers .container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+  .about-numbers h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.65rem, 2.5vw, 2rem);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .about-numbers .about-numbers-sub { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 40px; }
+  .about-numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  .about-stat {
+    background: var(--surface-2);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+  .about-stat-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    font-weight: 400;
+    color: var(--accent-green);
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+  .about-stat-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* Problem / Career Passport / Values – section block */
+  .about-block { padding: 72px 0; }
+  .about-block:nth-of-type(even) { background: var(--surface-2); }
+  .about-block .container { max-width: 800px; margin: 0 auto; padding: 0 32px; }
+  .about-block h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.65rem, 2.5vw, 2rem);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+  .about-block .about-block-sub { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 20px; }
+  .about-block p { font-size: 1.05rem; color: var(--text-muted); line-height: 1.75; margin-bottom: 18px; }
+  .about-block p:last-of-type { margin-bottom: 0; }
+  .about-block ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0;
+  }
+  .about-block ul li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 12px;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .about-block ul li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--accent-green);
+    font-weight: 600;
+  }
+
+  /* Vision & Mission – redesigned: dark strip + cards */
+  .about-vision-wrap {
+    position: relative;
+    padding: 80px 0;
+    overflow: hidden;
+    background: linear-gradient(165deg, #1a2d3a 0%, #1e3a4a 45%, #163d32 100%);
+  }
+  .about-vision-wrap::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    opacity: 0.8;
+  }
+  .about-vision-wrap .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 1;
+  }
+  .about-vision-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .about-vision-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-green);
+    margin-bottom: 12px;
+    opacity: 0.95;
+  }
+  .about-vision-wrap h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.85rem, 3vw, 2.5rem);
+    font-weight: 400;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .about-vision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: stretch;
+  }
+  .about-vision-card {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s ease, background 0.2s ease;
+  }
+  .about-vision-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 4px 0 0 4px;
+  }
+  .about-vision-card:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+  }
+  .about-vision-card .vision-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .about-vision-card .vision-icon .lucide {
+    width: 24px;
+    height: 24px;
+    color: var(--accent-green);
+  }
+  .about-vision-card h3 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-green);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .about-vision-card p {
+    font-size: 1.08rem;
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* Partners */
+  .about-partners .container { max-width: 800px; }
+
   @media (max-width: 900px) {
+    .about-numbers-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-vision-grid { grid-template-columns: 1fr; gap: 24px; }
+    .about-vision-wrap { padding: 64px 0; }
+    .about-vision-header { margin-bottom: 36px; }
     .about-mission { grid-template-columns: 1fr; gap: 40px; }
     .about-mission-image { min-height: 280px; order: -1; }
     .about-hero { min-height: 45vh; }
@@ -228,6 +414,8 @@
   @media (max-width: 768px) {
     .about-section .container, .about-why .container, .about-approach .container { padding: 0 20px; }
     .about-cta-inner { padding: 0 20px; }
+    .about-numbers-grid { grid-template-columns: 1fr; }
+    .about-block .container, .about-vision-wrap .container, .about-partners .container { padding: 0 20px; }
   }
 </style>
 
@@ -243,7 +431,7 @@
       Nigeria's Career Infrastructure Platform
     </p>
     <h1>About BridgeDegree</h1>
-    <p class="about-hero-desc">We build the verified professional identity of Nigerian students — from their first day in university to their first day in a global career.</p>
+    <p class="about-hero-desc">We build the verified professional identity of Nigerian students from their first day in university to their first day in a global career.</p>
   </div>
 </section>
 
@@ -254,10 +442,10 @@
   </div>
   <div class="about-mission-content">
       <h2>Our story</h2>
-      <p class="about-mission-lead">Nigeria's Embedded Career Infrastructure Layer — built by Nigerians, for Nigerians, who have lived the painful gap between earning a degree and gaining real global leverage.</p>
-      <p>We were founded on a clear, hard-earned truth: Nigeria produces extraordinary talent every year — sharp, capable, determined — yet the world consistently underestimates or overlooks our graduates. Not because of lack of ability, intelligence, or potential, but because of missing documentation, positioning, and structured access to global opportunities.</p>
-      <p>Most platforms try to fix this after graduation with courses, bootcamps, or quick placements. BridgeDegree takes a fundamentally different approach. We are an operating system that sits between the Nigerian university and the global economy, embedded directly into the university journey from 100 Level through graduation, NYSC, and beyond.</p>
-      <p class="about-quote">By the time a BridgeDegree student walks across that graduation stage, they are already positioned, published, and proven — with 2+ years of verifiable work experience, at least one co-authored indexed publication, and a tamper-proof Career Passport.</p>
+      <p class="about-mission-lead">BridgeDegree is Nigeria's Embedded Career Infrastructure Layer, built by Nigerians, for Nigerians, who have lived the painful gap between earning a degree and gaining real global leverage.</p>
+      <p>We were founded on a clear, hard-earned truth: Nigeria produces extraordinary talent every year, sharp, capable, determined, yet the world consistently underestimates or overlooks our graduates. Not because of lack of ability, intelligence, or potential, but because of missing documentation, positioning, and structured access to global opportunities.</p>
+      <p>Most platforms try to address this after graduation through courses, bootcamps, or short placements. BridgeDegree takes a fundamentally different approach. We are an operating system that sits between the Nigerian university and the global economy, embedded directly into the university journey from 100 Level through graduation, NYSC, and beyond.</p>
+      <p class="about-quote">Our mission is straightforward and uncompromising: By the time a BridgeDegree student collects their certificate and walks across that graduation stage, they are already positioned, published, and proven, carrying 2+ years of verifiable work experience, at least one co-authored indexed publication, blockchain-verified credentials in a tamper-proof Career Passport, and a clear, personalized pathway to a successful life.</p>
       <p>We don't wait for the system to change. We build the infrastructure layer that makes the change inevitable.</p>
   </div>
 </section>
@@ -268,7 +456,7 @@
   <div class="about-why-overlay"></div>
   <div class="container">
     <h2>Why we exist</h2>
-    <p>Nigeria produces over 600,000 graduates every year. Most are qualified. Nearly all are invisible to employers — not because they lack ability, but because the university system produces academic records and nothing else. No verified work history. No published research. No globally legible career profile.</p>
+    <p>Nigeria produces over 600,000 graduates every year. Most are qualified. Nearly all are invisible to employers, not because they lack ability, but because the university system produces academic records and nothing else. No verified work history. No published research. No globally legible career profile.</p>
     <p>BridgeDegree was founded in 2026 to solve this at the structural level. We give students a way to build proof while they study, so that by graduation, they hold credentials any employer, anywhere, can verify in seconds.</p>
   </div>
 </section>
@@ -277,7 +465,110 @@
 <section class="about-approach">
   <div class="container">
     <h2>Our approach</h2>
-    <p>BridgeDegree operates independently of any university, but open to collaborations. We work with students at every stage: from 100 Level through NYSC and into postgraduate and global careers.</p>
+    <p>BridgeDegree operates independently of any university, but is open to collaborations. We work with students at every stage: from 100 Level through NYSC and into postgraduate and global careers.</p>
+  </div>
+</section>
+
+<!-- By the numbers -->
+<section class="about-numbers">
+  <div class="container">
+    <h2>BY THE NUMBERS</h2>
+    <p class="about-numbers-sub">The BridgeDegree standard</p>
+    <div class="about-numbers-grid">
+      <div class="about-stat">
+        <div class="about-stat-num">2+</div>
+        <p class="about-stat-desc">Years of structured, performance-tracked work experience — authenticated and impossible to falsify.</p>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">1</div>
+        <p class="about-stat-desc">Co-authored, indexed academic publication — minimum requirement for every BridgeDegree graduate.</p>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">100%</div>
+        <p class="about-stat-desc">Career Passports are verified. Every credential is auditable, globally, in seconds.</p>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">48h</div>
+        <p class="about-stat-desc">Maximum time for any employer to verify a graduate's complete Career Passport via our HR portal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- The problem we solve -->
+<section class="about-block">
+  <div class="container">
+    <h2>THE PROBLEM WE SOLVE</h2>
+    <p class="about-block-sub">A credential crisis in Nigerian hiring</p>
+    <p>Nigerian universities produce hundreds of thousands of graduates each year. Employers from multinationals to fast-growing fintechs report the same problem: candidates arrive with degrees but without verifiable work records, documented research contributions, or professional endorsements from anyone who has actually worked with them.</p>
+    <p>The result is an expensive, unreliable hiring process. Employers spend time and money assessing candidates whose capabilities cannot be independently confirmed. Graduates, meanwhile, are trapped in a market that cannot see their true worth.</p>
+    <p>BridgeDegree replaces that uncertainty with proof. Our graduates do not ask employers to trust their word. They present a Career Passport, a verified, immutable, globally readable record of what they have done, who supervised it, and how they performed.</p>
+  </div>
+</section>
+
+<!-- The Career Passport -->
+<section class="about-block">
+  <div class="container">
+    <h2>THE CAREER PASSPORT</h2>
+    <p class="about-block-sub">A credential the world can read</p>
+    <p>The Career Passport is BridgeDegree's core innovation. It is not a certificate. It is not a transcript. It is an authenticated, employer-readable record of a graduate's verified capabilities — assembled over years.</p>
+    <ul>
+      <li>Work history — employer-verified, authenticated</li>
+      <li>Published research — globally indexed, co-authored under supervision</li>
+      <li>Performance reviews — structured, standardised, submitted by line managers</li>
+      <li>Mentor endorsements — named senior professionals who supervised the work</li>
+    </ul>
+    <p>Any employer, anywhere in the world, can verify a BridgeDegree Career Passport in under 48 hours. The record is immutable — it cannot be edited, deleted, or falsified by the graduate or anyone else.</p>
+  </div>
+</section>
+
+<!-- Our values -->
+<section class="about-block">
+  <div class="container">
+    <h2>OUR VALUES</h2>
+    <p class="about-block-sub">What we believe</p>
+    <ul>
+      <li><strong>Verifiability above all</strong> — We do not accept claimed credentials. Every capability on a BridgeDegree Career Passport is independently verified and immutably recorded.</li>
+      <li><strong>Earned access</strong> — BridgeDegree is not an open programme. Graduates earn their Career Passports through years of structured work, research, and professional development.</li>
+      <li><strong>Nigerian talent, global standards</strong> — We hold our graduates to the same standard as the best talent development programmes worldwide. Nigerian graduates deserve nothing less.</li>
+      <li><strong>Employer-first design</strong> — Every element of BridgeDegree, from placement agreements to Career Passport format, is designed around what employers actually need when making hiring decisions.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- Vision & Mission -->
+<section class="about-vision-wrap">
+  <div class="container">
+    <div class="about-vision-header">
+      <p class="about-vision-badge">Where we are going</p>
+      <h2>Vision & Mission</h2>
+    </div>
+    <div class="about-vision-grid">
+      <div class="about-vision-card">
+        <div class="vision-icon"><i data-lucide="compass"></i></div>
+        <h3>Our Vision</h3>
+        <p>A Nigeria where the highest-capability graduates are also the most visible, and where no employer, local or international, is forced to hire on faith alone.</p>
+      </div>
+      <div class="about-vision-card">
+        <div class="vision-icon"><i data-lucide="route"></i></div>
+        <h3>Our Mission</h3>
+        <p>To build and operate the most trusted graduate development pipeline in West Africa, producing verified, work-ready, research-active graduates whose credentials no employer ever has to take on faith.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Our partner ecosystem -->
+<section class="about-block about-partners">
+  <div class="container">
+    <h2>OUR PARTNER ECOSYSTEM</h2>
+    <p class="about-block-sub">The institutions behind our graduates</p>
+    <p>BridgeDegree operates through formal partnerships with corporate employers and a growing network of professional mentors. Each partner plays a defined role in producing and endorsing BridgeDegree graduates.</p>
+    <ul>
+      <li><strong>Corporate Partners</strong> — employers who commit to structured internship placements, assigned mentors, and formal performance reviews</li>
+      <li><strong>Professional Mentors</strong> — senior practitioners who supervise student development and add their professional endorsement to the Career Passport</li>
+      <li><strong>Research Supervisors</strong> — academic co-authors who guide students through the publication process</li>
+    </ul>
   </div>
 </section>
 

@@ -1,17 +1,18 @@
+<% const h = (typeof hero !== 'undefined' && hero) ? hero : {}; %>
 <section class="hero-wrapper" id="home">
   <div class="hero-bg">
-    <img src="/images/banna.jpg" alt="Graduates celebrating – BridgeDegree">
+    <img src="<%= h.bgImage || '/images/banna.jpg' %>" alt="Graduates celebrating – BridgeDegree">
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-inner">
     <div class="hero-badge">
       <i data-lucide="graduation-cap"></i>
-      Nigeria's Career Infrastructure Platform
+      <%= h.badgeText || "Nigeria's Career Infrastructure Platform" %>
     </div>
-    <h1 class="hero-title">Graduate with <span>proof</span></h1>
-    <p class="hero-desc">BridgeDegree embeds verified work experience, published research, and global career pathways directly into your university years, starting from 100 Level.</p>
+    <h1 class="hero-title"><%= h.title || 'Graduate with' %> <span><%= h.titleHighlight || 'proof' %></span></h1>
+    <p class="hero-desc"><%= h.description || 'BridgeDegree embeds verified work experience, published research, and global career pathways directly into your university years, starting from 100 Level.' %></p>
     <div class="hero-ctas">
-      <a href="/students/apply#apply" class="hero-btn hero-btn-main">Get Started <i data-lucide="rocket"></i></a>
+      <a href="<%= h.ctaUrl || '/students/apply#apply' %>" class="hero-btn hero-btn-main"><%= h.ctaText || 'Get Started' %> <i data-lucide="rocket"></i></a>
     </div>
   </div>
   <a href="#problem" class="hero-scroll" aria-label="Scroll to content">
@@ -169,17 +170,27 @@
   </div>
 </section>
 
+<% const partnerList = (typeof partners !== 'undefined' && partners && partners.length) ? partners : []; %>
 <section class="partners-section" id="partners" aria-label="Our partners">
   <div class="partners-inner">
     <h2 class="partners-title">Our Partners</h2>
     <div class="partners-carousel-wrap">
       <div class="partners-carousel">
+        <% if (partnerList.length) { %>
+          <% partnerList.forEach(function(p) { %>
+        <% if (p.link) { %><a href="<%= p.link %>" target="_blank" rel="noopener noreferrer" class="partner-logo-wrap"><% } %><img src="<%= p.logo %>" alt="<%= p.name %>" class="partner-logo"><% if (p.link) { %></a><% } %>
+          <% }); %>
+          <% partnerList.forEach(function(p) { %>
+        <% if (p.link) { %><a href="<%= p.link %>" target="_blank" rel="noopener noreferrer" class="partner-logo-wrap"><% } %><img src="<%= p.logo %>" alt="" class="partner-logo" aria-hidden="true"><% if (p.link) { %></a><% } %>
+          <% }); %>
+        <% } else { %>
         <img src="/images/p-1.png" alt="Partner 1" class="partner-logo">
         <img src="/images/p-2.jpeg" alt="Partner 2" class="partner-logo">
         <img src="/images/p-3.png" alt="Partner 3" class="partner-logo">
         <img src="/images/p-1.png" alt="" class="partner-logo" aria-hidden="true">
         <img src="/images/p-2.jpeg" alt="" class="partner-logo" aria-hidden="true">
         <img src="/images/p-3.png" alt="" class="partner-logo" aria-hidden="true">
+        <% } %>
       </div>
     </div>
   </div>

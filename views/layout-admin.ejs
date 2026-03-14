@@ -20,10 +20,9 @@
 <% } else { %>
   <div class="admin-wrap">
     <aside class="admin-sidebar">
-      <div class="admin-sidebar__logo">
-        <span class="admin-sidebar__logo-icon"></span>
-        <span class="admin-sidebar__logo-text">BridgeDegree</span>
-      </div>
+      <a href="/admin" class="admin-sidebar__logo">
+        <img src="/images/logo.png" alt="Bridge Degree" class="admin-sidebar__logo-img">
+      </a>
       <p class="admin-sidebar__nav-label">Navigation</p>
       <nav class="admin-sidebar__nav">
         <a href="/admin" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'dashboard' ? ' admin-sidebar__link--active' : '' %>">
@@ -37,6 +36,14 @@
         <a href="/admin/testimonials" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'testimonials' ? ' admin-sidebar__link--active' : '' %>">
           <i data-lucide="message-square-quote" class="admin-sidebar__icon"></i>
           <span>Testimonials</span>
+        </a>
+        <a href="/admin/partners" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'partners' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="building-2" class="admin-sidebar__icon"></i>
+          <span>Partners</span>
+        </a>
+        <a href="/admin/hero" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'hero' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="layout" class="admin-sidebar__icon"></i>
+          <span>Home Hero</span>
         </a>
         <a href="/admin/applications" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'applications' ? ' admin-sidebar__link--active' : '' %>">
           <i data-lucide="users" class="admin-sidebar__icon"></i>
@@ -55,10 +62,10 @@
     </aside>
     <div class="admin-right">
       <header class="admin-topbar">
-        <div class="admin-topbar__left">
-          <span class="admin-topbar__logo-icon"></span>
-          <span class="admin-topbar__logo-text">BridgeDegree Admin</span>
-        </div>
+        <a href="/admin" class="admin-topbar__left">
+          <img src="/images/logo.png" alt="Bridge Degree" class="admin-topbar__logo-img">
+          <span class="admin-topbar__logo-text">Admin</span>
+        </a>
         <div class="admin-topbar__search">
           <i data-lucide="search" class="admin-topbar__search-icon"></i>
           <input type="text" placeholder="Search..." class="admin-topbar__search-input" aria-label="Search">

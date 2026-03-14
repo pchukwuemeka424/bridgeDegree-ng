@@ -5,6 +5,9 @@ const jwt = require('jsonwebtoken');
 const SECRET = process.env.SESSION_SECRET || 'bridgedegree-admin-secret-change-in-production';
 const COOKIE = 'bd_admin_jwt';
 
+// Only set Secure when actually served over HTTPS (so login works on localhost)
+const isSecure = Boolean(process.env.BASE_URL && process.env.BASE_URL.startsWith('https'));
+
 function sign(payload) {
   return jwt.sign(payload, SECRET, { expiresIn: '24h' });
 }
@@ -13,14 +16,14 @@ function setAdminCookie(res, payload) {
   res.cookie(COOKIE, sign(payload), {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
+    secure: isSecure,
     maxAge: 24 * 60 * 60 * 1000,
     path: '/',
   });
 }
 
 function clearAdminCookie(res) {
-  res.clearCookie(COOKIE, { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 0 });
+  res.clearCookie(COOKIE, { httpOnly: true, sameSite: 'lax', secure: isSecure, path: '/', maxAge: 0 });
 }
 
 function getAdmin(req) {

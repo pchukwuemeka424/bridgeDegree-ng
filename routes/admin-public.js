@@ -19,7 +19,9 @@ router.get('/login', (req, res) => {
 
 // POST /admin/login
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body || {};
+  const raw = req.body || {};
+  const email = (raw.email || '').trim().toLowerCase();
+  const password = raw.password;
   if (!email || !password) {
     return res.redirect('/admin/login?error=1');
   }

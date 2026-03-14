@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= typeof title !== 'undefined' ? title : 'Student Dashboard' %> | BridgeDegree</title>
+  <title><%= typeof title !== 'undefined' ? title : 'Student Login' %> | BridgeDegree</title>
   <link rel="icon" type="image/png" href="/images/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/site.css">
   <link rel="stylesheet" href="/css/admin.css">
-  <link rel="stylesheet" href="/css/student-dashboard.css">
+  <link rel="stylesheet" href="/css/student-login.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="admin-body">
-  <main class="admin-main">
-    <%- body %>
-  </main>
+<body class="student-login-body">
+  <div class="student-login-wrap">
+    <main class="student-login-main">
+      <%- body %>
+    </main>
+    <aside class="student-login-panel" aria-hidden="true">
+      <div class="student-login-panel-overlay"></div>
+      <div class="student-login-panel-bg" style="background-image: url('/images/left.jpg');"></div>
+    </aside>
+  </div>
   <script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
 </body>
 </html>

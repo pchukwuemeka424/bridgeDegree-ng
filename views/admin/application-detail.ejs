@@ -1,0 +1,226 @@
+<div class="app-detail">
+  <nav class="app-detail-breadcrumb">
+    <a href="/admin">Dashboard</a>
+    <span class="app-detail-breadcrumb-sep">/</span>
+    <a href="/admin/applications">Applications</a>
+    <span class="app-detail-breadcrumb-sep">/</span>
+    <span class="app-detail-breadcrumb-current"><%= application.applicationId %></span>
+  </nav>
+
+  <header class="app-detail-hero">
+    <div class="app-detail-hero-main">
+      <h1 class="app-detail-hero-title"><%= application.firstname %> <%= application.lastname %></h1>
+      <p class="app-detail-hero-meta">
+        <span class="app-detail-hero-id"><%= application.applicationId %></span>
+        <span class="app-detail-hero-dot">·</span>
+        <a href="mailto:<%= application.email %>" class="app-detail-hero-email"><%= application.email %></a>
+        <span class="app-detail-hero-dot">·</span>
+        <span><%= application.university %></span>
+      </p>
+      <div class="app-detail-hero-actions">
+        <form method="post" action="/admin/applications/<%= application._id %>/status" class="app-detail-status-form">
+          <input type="hidden" name="redirect" value="/admin/applications/<%= application._id %>">
+          <select name="status" onchange="this.form.submit()" class="app-detail-status-select app-detail-status--<%= application.status %>">
+            <option value="submitted" <%= application.status === 'submitted' ? 'selected' : '' %>>Submitted</option>
+            <option value="under_review" <%= application.status === 'under_review' ? 'selected' : '' %>>Under review</option>
+            <option value="shortlisted" <%= application.status === 'shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+            <option value="accepted" <%= application.status === 'accepted' ? 'selected' : '' %>>Accepted</option>
+            <option value="rejected" <%= application.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
+          </select>
+        </form>
+        <a href="/student/dashboard?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" target="_blank" class="app-detail-btn app-detail-btn-primary">View student dashboard</a>
+        <a href="/admin/applications" class="app-detail-btn app-detail-btn-ghost">← Back to list</a>
+      </div>
+      <p class="app-detail-hero-dates">
+        Submitted <%= application.submittedAt ? new Date(application.submittedAt).toLocaleString() : '—' %>
+        <span class="app-detail-hero-dot">·</span>
+        Updated <%= application.updatedAt ? new Date(application.updatedAt).toLocaleString() : '—' %>
+      </p>
+    </div>
+  </header>
+
+  <div class="app-detail-grid">
+    <section class="app-detail-card">
+      <h2 class="app-detail-card-title">Personal & contact</h2>
+      <div class="app-detail-table-wrap">
+        <table class="app-detail-table">
+          <tbody>
+            <tr><td class="app-detail-table-label">Application ID</td><td class="app-detail-table-value"><code><%= application.applicationId %></code></td></tr>
+            <tr><td class="app-detail-table-label">First name</td><td class="app-detail-table-value"><%= application.firstname %></td></tr>
+            <tr><td class="app-detail-table-label">Last name</td><td class="app-detail-table-value"><%= application.lastname %></td></tr>
+            <tr><td class="app-detail-table-label">Email</td><td class="app-detail-table-value"><a href="mailto:<%= application.email %>"><%= application.email %></a></td></tr>
+            <tr><td class="app-detail-table-label">University</td><td class="app-detail-table-value"><%= application.university %></td></tr>
+            <tr><td class="app-detail-table-label">Level</td><td class="app-detail-table-value"><%= application.level %></td></tr>
+            <tr><td class="app-detail-table-label">Department</td><td class="app-detail-table-value"><%= application.department %></td></tr>
+            <tr><td class="app-detail-table-label">Career goal</td><td class="app-detail-table-value"><%= application.career_goal || '—' %></td></tr>
+            <tr><td class="app-detail-table-label">How did you hear about us?</td><td class="app-detail-table-value"><%= application.hear_about || '—' %></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-detail-card">
+      <h2 class="app-detail-card-title">Career & experience</h2>
+      <div class="app-detail-table-wrap">
+        <table class="app-detail-table">
+          <tbody>
+            <tr><td class="app-detail-table-label">Career fields</td><td class="app-detail-table-value"><%= (application.career_fields && application.career_fields.length) ? application.career_fields.join(', ') : '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Work experience type</td><td class="app-detail-table-value"><%= (application.work_experience_type && application.work_experience_type.length) ? application.work_experience_type.join(', ') : '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Work experience</td><td class="app-detail-table-value app-detail-table-value-block"><%= application.work_experience ? application.work_experience : '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Skills</td><td class="app-detail-table-value"><%= (application.skills && application.skills.length) ? application.skills.join(', ') : '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Other skills</td><td class="app-detail-table-value"><%= application.skills_other || '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Long-term goals</td><td class="app-detail-table-value"><%= (application.long_term_goals && application.long_term_goals.length) ? application.long_term_goals.join(', ') : '—' %></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-detail-card">
+      <h2 class="app-detail-card-title">Research & consent</h2>
+      <div class="app-detail-table-wrap">
+        <table class="app-detail-table">
+          <tbody>
+            <tr><td class="app-detail-table-label">Publish research interest</td><td class="app-detail-table-value app-detail-table-value-block"><%= application.publish_research || '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Final year project</td><td class="app-detail-table-value app-detail-table-value-block"><%= application.final_year_project || '—' %></td></tr>
+            <tr><td class="app-detail-table-label">Consent</td><td class="app-detail-table-value"><%= application.consent ? 'Yes' : 'No' %></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="app-detail-card app-detail-card-notes">
+      <h2 class="app-detail-card-title">Admin notes</h2>
+      <p class="app-detail-card-desc">Internal only — not visible to the applicant.</p>
+      <form method="post" action="/admin/applications/<%= application._id %>/notes" class="app-detail-notes-form">
+        <textarea name="adminNotes" class="app-detail-notes-textarea" rows="4" placeholder="Add notes about this application…"><%= application.adminNotes || '' %></textarea>
+        <button type="submit" class="app-detail-btn app-detail-btn-primary">Save notes</button>
+      </form>
+    </section>
+
+    <section class="app-detail-card app-detail-card-danger">
+      <h2 class="app-detail-card-title">Danger zone</h2>
+      <p class="app-detail-danger-desc">Deleting this application cannot be undone. The applicant will no longer be able to access their dashboard with this application ID.</p>
+      <form method="post" action="/admin/applications/<%= application._id %>/delete" onsubmit="return confirm('Are you sure you want to delete this application? This cannot be undone.');">
+        <button type="submit" class="app-detail-btn app-detail-btn-danger">Delete application</button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<style>
+.app-detail { max-width: 960px; margin: 0 auto; padding-bottom: 48px; }
+.app-detail-breadcrumb { font-size: 0.85rem; color: #64748b; margin-bottom: 24px; }
+.app-detail-breadcrumb a { color: var(--admin-accent-blue); text-decoration: none; }
+.app-detail-breadcrumb a:hover { text-decoration: underline; }
+.app-detail-breadcrumb-sep { margin: 0 8px; opacity: 0.6; }
+.app-detail-breadcrumb-current { color: #1e293b; font-weight: 500; }
+
+.app-detail-hero {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 16px;
+  padding: 32px 36px;
+  margin-bottom: 32px;
+  color: #fff;
+  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.25);
+}
+.app-detail-hero-title { margin: 0 0 8px 0; font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+.app-detail-hero-meta { margin: 0 0 20px 0; font-size: 0.95rem; opacity: 0.9; }
+.app-detail-hero-id { font-family: ui-monospace, monospace; font-size: 0.9rem; }
+.app-detail-hero-email { color: #93c5fd; text-decoration: none; }
+.app-detail-hero-email:hover { text-decoration: underline; }
+.app-detail-hero-dot { margin: 0 10px; opacity: 0.5; }
+.app-detail-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 16px; }
+.app-detail-status-form { display: inline-block; }
+.app-detail-status-select {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 36px;
+}
+.app-detail-status-select:focus { outline: none; border-color: rgba(147, 197, 253, 0.8); }
+.app-detail-status-select option { background: #1e293b; color: #fff; }
+.app-detail-hero-dates { margin: 0; font-size: 0.85rem; opacity: 0.75; }
+
+.app-detail-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.app-detail-btn-primary { background: #3b82f6; color: #fff; }
+.app-detail-btn-primary:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+.app-detail-btn-ghost { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.app-detail-btn-ghost:hover { background: rgba(255,255,255,0.15); }
+.app-detail-btn-danger { background: #dc2626; color: #fff; }
+.app-detail-btn-danger:hover { background: #b91c1c; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35); }
+
+.app-detail-grid { display: grid; gap: 24px; }
+.app-detail-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 24px 28px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+}
+.app-detail-card-title { margin: 0 0 16px 0; font-size: 1rem; font-weight: 700; color: #334155; letter-spacing: -0.01em; }
+.app-detail-card-desc { margin: -8px 0 14px 0; font-size: 0.85rem; color: #64748b; }
+
+.app-detail-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+.app-detail-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.app-detail-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.15s; }
+.app-detail-table tbody tr:last-child { border-bottom: none; }
+.app-detail-table tbody tr:hover { background: #f8fafc; }
+.app-detail-table-label {
+  width: 38%;
+  min-width: 160px;
+  padding: 14px 18px;
+  font-weight: 500;
+  color: #64748b;
+  font-size: 0.85rem;
+  vertical-align: top;
+}
+.app-detail-table-value {
+  padding: 14px 18px;
+  color: #1e293b;
+  word-break: break-word;
+}
+.app-detail-table-value code { font-size: 0.88em; background: #f1f5f9; padding: 2px 8px; border-radius: 6px; }
+.app-detail-table-value a { color: var(--admin-accent-blue); text-decoration: none; }
+.app-detail-table-value a:hover { text-decoration: underline; }
+.app-detail-table-value-block { white-space: pre-wrap; line-height: 1.5; }
+
+.app-detail-notes-form { margin-top: 4px; }
+.app-detail-notes-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 14px;
+  display: block;
+}
+.app-detail-notes-textarea:focus { outline: none; border-color: var(--admin-accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+
+.app-detail-card-danger { border-color: #fecaca; background: #fef2f2; }
+.app-detail-card-danger .app-detail-card-title { color: #991b1b; }
+.app-detail-danger-desc { margin: 0 0 16px 0; font-size: 0.9rem; color: #b91c1c; line-height: 1.5; }
+</style>

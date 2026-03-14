@@ -1,0 +1,46 @@
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Partners</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="building-2"></i> Partners</h1>
+  <p class="admin-page-desc">Manage partner logos shown in the homepage carousel.</p>
+</div>
+
+<div class="admin-actions">
+  <a href="/admin/partners/new" class="admin-btn admin-btn-primary"><i data-lucide="plus"></i> New partner</a>
+  <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
+</div>
+
+<div class="admin-card">
+  <% if (partners && partners.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Logo</th>
+        <th>Name</th>
+        <th>Link</th>
+        <th>Order</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% partners.forEach(function(p) { %>
+      <tr>
+        <td><% if (p.logo) { %><img src="<%= p.logo %>" alt="" style="max-width: 80px; max-height: 40px; object-fit: contain;"><% } else { %>—<% } %></td>
+        <td><%= p.name %></td>
+        <td><%= p.link ? (p.link.length > 40 ? p.link.slice(0, 40) + '…' : p.link) : '—' %></td>
+        <td><%= p.order %></td>
+        <td><span class="admin-badge <%= p.active ? 'admin-badge-published' : 'admin-badge-draft' %>"><%= p.active ? 'Yes' : 'No' %></span></td>
+        <td class="actions">
+          <a href="/admin/partners/<%= p._id %>/edit" class="admin-btn admin-btn-secondary">Edit</a>
+          <form method="post" action="/admin/partners/<%= p._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this partner?');">
+            <button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p>No partners yet. <a href="/admin/partners/new" class="admin-btn admin-btn-primary" style="margin-top:12px;">Add your first partner</a></p>
+  <% } %>
+</div>

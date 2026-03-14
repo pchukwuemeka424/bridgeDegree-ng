@@ -1,0 +1,35 @@
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / <a href="/admin/partners">Partners</a> / <%= partner ? 'Edit' : 'New' %></nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="building-2"></i> <%= partner ? 'Edit partner' : 'New partner' %></h1>
+</div>
+<div class="admin-actions">
+  <a href="/admin/partners" class="admin-btn admin-btn-secondary">Back to partners</a>
+</div>
+<div class="admin-card">
+  <form method="post" action="<%= partner ? '/admin/partners/' + partner._id : '/admin/partners' %>" enctype="multipart/form-data">
+    <div class="admin-form-group">
+      <label for="name">Partner name *</label>
+      <input type="text" id="name" name="name" required value="<%= partner ? (partner.name || '') : '' %>" placeholder="e.g. Acme Corp">
+    </div>
+    <div class="admin-form-group">
+      <label for="logo">Logo image *</label>
+      <% if (partner && partner.logo) { %>
+      <p style="margin-bottom: 8px;"><img src="<%= partner.logo %>" alt="" style="max-width: 160px; max-height: 80px; object-fit: contain; border-radius: 8px;"></p>
+      <p style="font-size: 0.9rem; color: #64748b;">Upload a new image to replace.</p>
+      <% } %>
+      <input type="file" id="logo" name="logo" accept="image/jpeg,image/png,image/gif,image/webp" <%= !partner ? 'required' : '' %>>
+    </div>
+    <div class="admin-form-group">
+      <label for="link">Website URL (optional)</label>
+      <input type="url" id="link" name="link" value="<%= partner ? (partner.link || '') : '' %>" placeholder="https://...">
+    </div>
+    <div class="admin-form-group">
+      <label for="order">Display order (lower = first)</label>
+      <input type="number" id="order" name="order" value="<%= partner ? (partner.order ?? 0) : 0 %>" min="0">
+    </div>
+    <div class="admin-form-group">
+      <label><input type="checkbox" name="active" <%= (partner && partner.active !== false) || !partner ? 'checked' : '' %>> Active (show on homepage)</label>
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary"><%= partner ? 'Update' : 'Create' %> partner</button>
+  </form>
+</div>

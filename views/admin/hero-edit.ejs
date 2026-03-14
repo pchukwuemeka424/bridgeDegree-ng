@@ -1,0 +1,51 @@
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Home Hero</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="layout"></i> Home Hero Section</h1>
+  <p class="admin-page-desc">Edit the hero section text and background shown on the homepage.</p>
+</div>
+<div class="admin-actions">
+  <a href="/" target="_blank" class="admin-btn admin-btn-secondary">View homepage</a>
+</div>
+<div class="admin-card">
+  <form method="post" action="/admin/hero" enctype="multipart/form-data">
+    <div class="admin-form-group">
+      <label for="badgeText">Badge text (small line above title)</label>
+      <input type="text" id="badgeText" name="badgeText" value="<%= hero.badgeText || '' %>" placeholder="e.g. Nigeria's Career Infrastructure Platform">
+    </div>
+    <div class="admin-form-group">
+      <label for="title">Title (main headline)</label>
+      <input type="text" id="title" name="title" value="<%= hero.title || '' %>" placeholder="e.g. Graduate with">
+    </div>
+    <div class="admin-form-group">
+      <label for="titleHighlight">Title highlight word (wrapped in &lt;span&gt;)</label>
+      <input type="text" id="titleHighlight" name="titleHighlight" value="<%= hero.titleHighlight || '' %>" placeholder="e.g. proof">
+    </div>
+    <div class="admin-form-group">
+      <label for="description">Description paragraph</label>
+      <textarea id="description" name="description" style="min-height: 120px;"><%= hero.description || '' %></textarea>
+    </div>
+    <div class="admin-form-group">
+      <label for="ctaText">Button text</label>
+      <input type="text" id="ctaText" name="ctaText" value="<%= hero.ctaText || '' %>" placeholder="e.g. Get Started">
+    </div>
+    <div class="admin-form-group">
+      <label for="ctaUrl">Button URL</label>
+      <input type="text" id="ctaUrl" name="ctaUrl" value="<%= hero.ctaUrl || '' %>" placeholder="e.g. /students/apply#apply">
+    </div>
+    <div class="admin-form-group">
+      <label>Background image</label>
+      <% if (hero.bgImage) { %>
+      <p style="margin-bottom: 8px;"><img src="<%= hero.bgImage %>" alt="Current hero" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; border: 1px solid var(--border, #e2e8f0);"></p>
+      <% } %>
+      <p style="margin-bottom: 8px;">
+        <label for="bgImageFile" class="admin-btn admin-btn-secondary" style="display: inline-flex; align-items: center; gap: 6px; cursor: pointer;"><i data-lucide="upload"></i> Choose image to upload</label>
+        <input type="file" id="bgImageFile" name="bgImageFile" accept="image/jpeg,image/png,image/gif,image/webp" style="position: absolute; width: 0.1px; height: 0.1px; opacity: 0; overflow: hidden;" aria-label="Upload hero background image">
+        <span id="bgImageFile-name" style="margin-left: 8px; font-size: 0.9rem; color: var(--text-muted, #64748b);"></span>
+      </p>
+      <script>document.getElementById('bgImageFile').addEventListener('change', function(){ var n=this.files[0]?this.files[0].name:''; document.getElementById('bgImageFile-name').textContent=n; });</script>
+      <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 6px;">Or enter a URL/path:</p>
+      <input type="text" id="bgImage" name="bgImage" value="<%= hero.bgImage || '' %>" placeholder="e.g. /images/banna.jpg">
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary">Save hero section</button>
+  </form>
+</div>

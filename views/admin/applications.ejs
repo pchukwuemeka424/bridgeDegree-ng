@@ -1,15 +1,33 @@
 <nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Applications</nav>
 <div class="admin-page-header">
   <h1 class="admin-page-title"><i data-lucide="users"></i> Student applications</h1>
-  <p class="admin-page-desc">Review and update status of student applications.</p>
+  <p class="admin-page-desc">Review, filter, and manage student applications.</p>
 </div>
 
 <div class="admin-actions">
   <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
 </div>
 
+<div class="admin-card admin-applications-toolbar">
+  <form method="get" action="/admin/applications" class="admin-applications-search">
+    <input type="hidden" name="status" value="<%= typeof statusFilter !== 'undefined' ? statusFilter : '' %>">
+    <input type="search" name="q" value="<%= typeof searchQ !== 'undefined' ? searchQ : '' %>" placeholder="Search by name, email, ID, university…" class="admin-input admin-search-input" aria-label="Search applications">
+    <button type="submit" class="admin-btn admin-btn-primary">Search</button>
+  </form>
+  <div class="admin-applications-filters">
+    <span class="admin-filters-label">Status:</span>
+    <a href="/admin/applications<%= (typeof searchQ !== 'undefined' && searchQ) ? '?q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= !statusFilter ? ' admin-filter-pill--active' : '' %>">All</a>
+    <a href="/admin/applications?status=submitted<%= (typeof searchQ !== 'undefined' && searchQ) ? '&q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= statusFilter === 'submitted' ? ' admin-filter-pill--active' : '' %>">Submitted <%= typeof counts !== 'undefined' && counts.submitted != null ? '(' + counts.submitted + ')' : '' %></a>
+    <a href="/admin/applications?status=under_review<%= (typeof searchQ !== 'undefined' && searchQ) ? '&q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= statusFilter === 'under_review' ? ' admin-filter-pill--active' : '' %>">Under review <%= typeof counts !== 'undefined' && counts.under_review != null ? '(' + counts.under_review + ')' : '' %></a>
+    <a href="/admin/applications?status=shortlisted<%= (typeof searchQ !== 'undefined' && searchQ) ? '&q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= statusFilter === 'shortlisted' ? ' admin-filter-pill--active' : '' %>">Shortlisted <%= typeof counts !== 'undefined' && counts.shortlisted != null ? '(' + counts.shortlisted + ')' : '' %></a>
+    <a href="/admin/applications?status=accepted<%= (typeof searchQ !== 'undefined' && searchQ) ? '&q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= statusFilter === 'accepted' ? ' admin-filter-pill--active' : '' %>">Accepted <%= typeof counts !== 'undefined' && counts.accepted != null ? '(' + counts.accepted + ')' : '' %></a>
+    <a href="/admin/applications?status=rejected<%= (typeof searchQ !== 'undefined' && searchQ) ? '&q=' + encodeURIComponent(searchQ) : '' %>" class="admin-filter-pill<%= statusFilter === 'rejected' ? ' admin-filter-pill--active' : '' %>">Rejected <%= typeof counts !== 'undefined' && counts.rejected != null ? '(' + counts.rejected + ')' : '' %></a>
+  </div>
+</div>
+
 <div class="admin-card">
   <% if (applications && applications.length) { %>
+  <p class="admin-table-summary"><strong><%= applications.length %></strong> application(s)</p>
   <table class="admin-table">
     <thead>
       <tr>
@@ -26,7 +44,7 @@
     <tbody>
       <% applications.forEach(function(a) { %>
       <tr>
-        <td><%= a.applicationId %></td>
+        <td><a href="/admin/applications/<%= a._id %>" class="admin-table-id"><%= a.applicationId %></a></td>
         <td><%= a.firstname %> <%= a.lastname %></td>
         <td><%= a.email %></td>
         <td><%= a.university %></td>
@@ -43,12 +61,15 @@
           </form>
         </td>
         <td><%= a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : '' %></td>
-        <td><a href="/student/dashboard?email=<%= encodeURIComponent(a.email) %>&applicationId=<%= encodeURIComponent(a.applicationId) %>" target="_blank" class="admin-btn admin-btn-secondary">View</a></td>
+        <td class="admin-table-actions-cell">
+          <a href="/admin/applications/<%= a._id %>" class="admin-btn admin-btn-secondary">Details</a>
+          <a href="/student/dashboard?email=<%= encodeURIComponent(a.email) %>&applicationId=<%= encodeURIComponent(a.applicationId) %>" target="_blank" class="admin-btn admin-btn-secondary">Student view</a>
+        </td>
       </tr>
       <% }); %>
     </tbody>
   </table>
   <% } else { %>
-  <p>No applications yet.</p>
+  <p class="admin-empty-state">No applications<% if (typeof statusFilter !== 'undefined' && statusFilter) { %> with status "<%= statusFilter %>"<% } %><% if (typeof searchQ !== 'undefined' && searchQ) { %> matching "<%= searchQ %>"<% } %>.</p>
   <% } %>
 </div>

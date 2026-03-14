@@ -18,7 +18,7 @@ const routes = {
   students_apply: { path: '/students/apply', title: 'Apply' },
   partners: { path: '/partners', title: 'Partners' },
   how_it_works: { path: '/how-it-works', title: 'How It Works' },
-  about: { path: '/about', title: 'About' },
+  about: { path: '/about', title: 'About Us' },
   blog: { path: '/blog', title: 'Blog' },
   faq: { path: '/faq', title: 'FAQ' },
   contact: { path: '/contact', title: 'Contact' },
@@ -28,7 +28,7 @@ const routes = {
 const quickLinks = [
   { path: '/faq', label: 'FAQ' },
   { path: '/policy', label: 'Policy' },
-  { path: '/about', label: 'About' },
+  { path: '/about', label: 'About Us' },
   { path: '/contact', label: 'Contact Us' },
   { path: '/how-it-works', label: 'How It Works' },
 ];
@@ -99,6 +99,8 @@ const studentRoutes = require('./routes/student');
 const StudentApplication = require('./models/StudentApplication');
 const BlogPost = require('./models/BlogPost');
 const Testimonial = require('./models/Testimonial');
+const Partner = require('./models/Partner');
+const HomeHero = require('./models/HomeHero');
 
 let dbReadyPromise = null;
 function ensureDb() {
@@ -123,9 +125,19 @@ app.get('/', async (req, res) => {
   res.locals.currentRoute = 'index';
   let homePosts = [];
   let testimonials = [];
+  let partners = [];
+  let hero = null;
   try {
-    homePosts = await BlogPost.find({ published: true }).sort({ createdAt: -1 }).limit(2).lean();
-    testimonials = await Testimonial.find({ featured: true }).sort({ createdAt: -1 }).limit(6).lean();
+    const [posts, featuredTestimonials, heroDoc, activePartners] = await Promise.all([
+      BlogPost.find({ published: true }).sort({ createdAt: -1 }).limit(2).lean(),
+      Testimonial.find({ featured: true }).sort({ createdAt: -1 }).limit(6).lean(),
+      HomeHero.findOne().lean(),
+      Partner.find({ active: true }).sort({ order: 1, createdAt: 1 }).lean(),
+    ]);
+    homePosts = posts;
+    testimonials = featuredTestimonials;
+    hero = heroDoc;
+    partners = activePartners;
   } catch (err) {
     console.error(err);
   }
@@ -135,6 +147,8 @@ app.get('/', async (req, res) => {
     metaDescription: 'Nigeria\'s career infrastructure for university students. Get verified work experience, publish your research, and build a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
     homePosts,
     testimonials,
+    partners,
+    hero,
   });
 });
 
@@ -273,9 +287,9 @@ app.get('/about', (req, res) => {
   res.locals.currentRoute = 'about';
   res.locals.breadcrumbDark = true;
   res.render('about', {
-    title: 'About',
-    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'About' }],
-    metaDescription: 'About BridgeDegree: career infrastructure for Nigerian university students. African graduate employability, university career infrastructure, and global mobility.',
+    title: 'About Us',
+    breadcrumb: [{ path: '/', label: 'Home' }, { label: 'About Us' }],
+    metaDescription: 'About BridgeDegree: Nigeria\'s career infrastructure platform. Verified professional identity for Nigerian students from first day in university to first day in a global career.',
   });
 });
 

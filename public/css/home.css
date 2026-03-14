@@ -47,6 +47,7 @@
 .partners-title { font-family: 'DM Serif Display', serif; font-size: clamp(1.75rem, 2.5vw, 2.25rem); font-weight: 400; text-align: center; margin-bottom: 32px; color: var(--text); }
 .partners-carousel-wrap { overflow: hidden; }
 .partners-carousel { display: flex; gap: 48px; animation: partners-scroll 30s linear infinite; }
+.partners-carousel .partner-logo-wrap { display: flex; align-items: center; flex-shrink: 0; }
 .partners-carousel .partner-logo { height: 56px; width: auto; object-fit: contain; flex-shrink: 0; opacity: 0.85; }
 @keyframes partners-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .pub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }

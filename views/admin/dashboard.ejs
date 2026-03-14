@@ -26,6 +26,13 @@
       <div class="label">Student applications</div>
     </div>
   </div>
+  <div class="admin-stat">
+    <div class="admin-stat__icon admin-stat__icon--purple"><i data-lucide="building-2"></i></div>
+    <div class="admin-stat__content">
+      <div class="num"><%= typeof partnerCount !== 'undefined' ? partnerCount : 0 %></div>
+      <div class="label">Partners</div>
+    </div>
+  </div>
 </div>
 
 <div class="admin-card">
@@ -35,6 +42,9 @@
     <a href="/admin/blog" class="admin-btn admin-btn-secondary">Manage blog</a>
     <a href="/admin/testimonials/new" class="admin-btn admin-btn-secondary">New testimonial</a>
     <a href="/admin/testimonials" class="admin-btn admin-btn-secondary">Manage testimonials</a>
+    <a href="/admin/partners/new" class="admin-btn admin-btn-secondary">New partner</a>
+    <a href="/admin/partners" class="admin-btn admin-btn-secondary">Manage partners</a>
+    <a href="/admin/hero" class="admin-btn admin-btn-secondary">Edit home hero</a>
     <a href="/admin/applications" class="admin-btn admin-btn-secondary">View applications</a>
   </div>
 </div>

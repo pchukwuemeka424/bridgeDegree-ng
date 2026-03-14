@@ -36,4 +36,68 @@ const upload = multer({
   },
 });
 
+// Partner logo upload (local: public/uploads/partners)
+let partnerStorage;
+if (useBlob) {
+  partnerStorage = multer.memoryStorage();
+} else {
+  const isVercel = process.env.VERCEL === '1';
+  const partnerDir = isVercel
+    ? path.join(os.tmpdir(), 'uploads', 'partners')
+    : path.join(__dirname, '..', 'public', 'uploads', 'partners');
+  if (!fs.existsSync(partnerDir)) {
+    fs.mkdirSync(partnerDir, { recursive: true });
+  }
+  partnerStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, partnerDir),
+    filename: (req, file, cb) => {
+      const ext = (file.mimetype === 'image/png') ? 'png' : (file.mimetype === 'image/jpeg' ? 'jpg' : 'jpg');
+      cb(null, `partner-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`);
+    },
+  });
+}
+
+const uploadPartner = multer({
+  storage: partnerStorage,
+  limits: { fileSize: 2 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = /image\/(jpeg|png|gif|webp)/;
+    if (allowed.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed.'));
+  },
+});
+
+// Hero background image upload (local: public/uploads/hero)
+let heroStorage;
+if (useBlob) {
+  heroStorage = multer.memoryStorage();
+} else {
+  const isVercel = process.env.VERCEL === '1';
+  const heroDir = isVercel
+    ? path.join(os.tmpdir(), 'uploads', 'hero')
+    : path.join(__dirname, '..', 'public', 'uploads', 'hero');
+  if (!fs.existsSync(heroDir)) {
+    fs.mkdirSync(heroDir, { recursive: true });
+  }
+  heroStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, heroDir),
+    filename: (req, file, cb) => {
+      const ext = (file.mimetype === 'image/png') ? 'png' : (file.mimetype === 'image/jpeg' ? 'jpg' : 'jpg');
+      cb(null, `hero-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`);
+    },
+  });
+}
+
+const uploadHero = multer({
+  storage: heroStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = /image\/(jpeg|png|gif|webp)/;
+    if (allowed.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed.'));
+  },
+});
+
 module.exports = upload;
+module.exports.uploadPartner = uploadPartner;
+module.exports.uploadHero = uploadHero;

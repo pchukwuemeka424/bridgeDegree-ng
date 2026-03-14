@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 const studentApplicationSchema = new mongoose.Schema({
   applicationId: { type: String, required: true, unique: true },
+  password: { type: String, select: false },
   // Step 1
   firstname: { type: String, required: true, trim: true },
   lastname: { type: String, required: true, trim: true },
@@ -31,6 +33,7 @@ const studentApplicationSchema = new mongoose.Schema({
     enum: ['submitted', 'under_review', 'shortlisted', 'accepted', 'rejected'],
     default: 'submitted',
   },
+  adminNotes: { type: String, default: '' },
   submittedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -44,5 +47,14 @@ studentApplicationSchema.pre('save', function () {
     this.applicationId = 'BD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
   }
 });
+
+studentApplicationSchema.pre('save', async function () {
+  if (!this.isModified('password') || !this.password) return;
+  this.password = await bcrypt.hash(this.password, 10);
+});
+
+studentApplicationSchema.methods.comparePassword = function (candidate) {
+  return bcrypt.compare(candidate, this.password || '');
+};
 
 module.exports = mongoose.model('StudentApplication', studentApplicationSchema);
