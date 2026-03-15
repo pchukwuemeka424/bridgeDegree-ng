@@ -34,6 +34,7 @@ const studentApplicationSchema = new mongoose.Schema({
     default: 'submitted',
   },
   adminNotes: { type: String, default: '' },
+  passportPhoto: { type: String, default: '' },
   submittedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

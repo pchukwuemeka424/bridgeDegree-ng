@@ -5,6 +5,11 @@
 <div class="admin-actions">
   <a href="/admin/blog" class="admin-btn admin-btn-secondary">Back to blog</a>
 </div>
+<% if (typeof error !== 'undefined' && error) { %>
+<div class="admin-card admin-error-card" style="margin-bottom: 16px; border-color: var(--admin-accent-red, #ef4444); background: #fef2f2;">
+  <p style="margin: 0; color: var(--admin-accent-red, #ef4444);"><%= error %></p>
+</div>
+<% } %>
 <div class="admin-card">
   <form method="post" action="<%= post ? '/admin/blog/' + post._id : '/admin/blog' %>" enctype="multipart/form-data">
     <div class="admin-form-group">

@@ -13,10 +13,96 @@
   <link rel="stylesheet" href="/css/student-dashboard.css">
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="admin-body">
-  <main class="admin-main">
+<body class="student-body <%= (typeof studentNav !== 'undefined' && studentNav && application) ? 'student-body--with-sidebar' : '' %>">
+  <% if (typeof studentNav !== 'undefined' && studentNav && typeof application !== 'undefined' && application) { %>
+  <!-- Top bar (Flowdash-style: logo + user) -->
+  <header class="sd-topbar">
+    <div class="sd-topbar__left">
+      <button type="button" class="sd-topbar__menu" id="student-sidebar-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="student-sidebar">
+        <i data-lucide="menu"></i>
+      </button>
+      <a href="/student/dashboard?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-topbar__logo">
+        <img src="/images/logo.png" alt="BridgeDegree">
+      </a>
+    </div>
+    <div class="sd-topbar__right">
+      <div class="sd-topbar__user">
+        <span class="sd-topbar__user-avatar"><%= (application.firstname || '').charAt(0) %><%= (application.lastname || '').charAt(0) %></span>
+        <span class="sd-topbar__user-name"><%= application.firstname %> <%= application.lastname %></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar (dark blue, MENU + nav) -->
+  <aside class="sd-sidebar" id="student-sidebar" aria-label="Dashboard navigation">
+    <div class="sd-sidebar__menu-label">Menu</div>
+    <nav class="sd-sidebar__nav">
+      <a href="/student/dashboard?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-sidebar__link <%= studentNav.dashboard ? 'sd-sidebar__link--active' : '' %>">
+        <i data-lucide="layout-dashboard"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="/student/dashboard/learning?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-sidebar__link <%= studentNav.learning ? 'sd-sidebar__link--active' : '' %>">
+        <i data-lucide="graduation-cap"></i>
+        <span>Learning</span>
+      </a>
+      <a href="/student/dashboard/account?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-sidebar__link <%= studentNav.account ? 'sd-sidebar__link--active' : '' %>">
+        <i data-lucide="user-circle"></i>
+        <span>Edit Account</span>
+      </a>
+      <a href="/student/dashboard/password?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-sidebar__link <%= studentNav.password ? 'sd-sidebar__link--active' : '' %>">
+        <i data-lucide="lock"></i>
+        <span>Password</span>
+      </a>
+      <a href="/student/dashboard/career-passport?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-sidebar__link">
+        <i data-lucide="briefcase"></i>
+        <span>Career Passport</span>
+      </a>
+      <a href="/how-it-works" class="sd-sidebar__link" target="_blank" rel="noopener noreferrer">
+        <i data-lucide="book-open"></i>
+        <span>How it works</span>
+      </a>
+    </nav>
+    <div class="sd-sidebar__foot">
+      <a href="/student/login" class="sd-sidebar__link sd-sidebar__link--out">
+        <i data-lucide="log-out"></i>
+        <span>Sign out</span>
+      </a>
+    </div>
+  </aside>
+  <div class="sd-overlay" id="student-overlay" aria-hidden="true"></div>
+  <% } %>
+
+  <main class="sd-main">
+    <% if (typeof breadcrumb !== 'undefined' && breadcrumb && breadcrumb.length) { %>
+    <nav class="sd-breadcrumb" aria-label="Breadcrumb">
+      <a href="/student/dashboard?email=<%= encodeURIComponent(application && application.email) %>&applicationId=<%= encodeURIComponent(application && application.applicationId) %>"><i data-lucide="home"></i></a>
+      <span class="sd-breadcrumb__sep">/</span>
+      <span class="sd-breadcrumb__current"><%= breadcrumb[breadcrumb.length - 1] %></span>
+    </nav>
+    <% } %>
     <%- body %>
   </main>
+  <script>
+    (function() {
+      var sidebar = document.getElementById('student-sidebar');
+      var toggle = document.getElementById('student-sidebar-toggle');
+      var overlay = document.getElementById('student-overlay');
+      function closeSidebar() {
+        if (sidebar) sidebar.classList.remove('sd-sidebar--open');
+        if (overlay) overlay.classList.remove('sd-overlay--visible');
+        if (toggle) toggle.setAttribute('aria-expanded', 'false');
+        if (overlay) overlay.setAttribute('aria-hidden', 'true');
+      }
+      if (sidebar && toggle) {
+        toggle.addEventListener('click', function() {
+          var open = sidebar.classList.toggle('sd-sidebar--open');
+          toggle.setAttribute('aria-expanded', open);
+          if (overlay) { overlay.classList.toggle('sd-overlay--visible', open); overlay.setAttribute('aria-hidden', open ? 'false' : 'true'); }
+        });
+      }
+      if (overlay) overlay.addEventListener('click', closeSidebar);
+    })();
+  </script>
   <script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>
 </body>
 </html>

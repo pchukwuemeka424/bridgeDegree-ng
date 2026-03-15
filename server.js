@@ -95,12 +95,13 @@ app.get('/students', (req, res) => {
 const adminPublic = require('./routes/admin-public');
 const adminProtected = require('./routes/admin-protected');
 const { requireAdmin } = require('./middleware/auth');
-const studentRoutes = require('./routes/student');
+const studentRoutes = require('./routes/student/index');
 const StudentApplication = require('./models/StudentApplication');
 const BlogPost = require('./models/BlogPost');
 const Testimonial = require('./models/Testimonial');
 const Partner = require('./models/Partner');
 const HomeHero = require('./models/HomeHero');
+const { sendWelcomeEmail } = require('./services/email');
 
 let dbReadyPromise = null;
 function ensureDb() {
@@ -191,6 +192,11 @@ app.post('/students/apply', async (req, res) => {
       final_year_project: b.final_year_project || '',
       consent: b.consent === 'on' || b.consent === true,
     });
+    sendWelcomeEmail({
+      email: doc.email,
+      firstname: doc.firstname,
+      applicationId: doc.applicationId,
+    }).catch((err) => console.error('Welcome email failed:', err));
     return res.redirect('/students/apply/success?applicationId=' + encodeURIComponent(doc.applicationId) + '&email=' + encodeURIComponent(doc.email));
   } catch (err) {
     console.error('Application submit error:', err);

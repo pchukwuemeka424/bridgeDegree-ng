@@ -98,6 +98,38 @@ const uploadHero = multer({
   },
 });
 
+// Student passport photo upload (profile picture / ID photo)
+let passportStorage;
+if (useBlob) {
+  passportStorage = multer.memoryStorage();
+} else {
+  const isVercel = process.env.VERCEL === '1';
+  const passportDir = isVercel
+    ? path.join(os.tmpdir(), 'uploads', 'passports')
+    : path.join(__dirname, '..', 'public', 'uploads', 'passports');
+  if (!fs.existsSync(passportDir)) {
+    fs.mkdirSync(passportDir, { recursive: true });
+  }
+  passportStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, passportDir),
+    filename: (req, file, cb) => {
+      const ext = (file.mimetype === 'image/png') ? 'png' : (file.mimetype === 'image/jpeg' ? 'jpg' : 'jpg');
+      cb(null, `passport-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`);
+    },
+  });
+}
+
+const uploadPassport = multer({
+  storage: passportStorage,
+  limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = /image\/(jpeg|png|gif|webp)/;
+    if (allowed.test(file.mimetype)) return cb(null, true);
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed.'));
+  },
+});
+
 module.exports = upload;
 module.exports.uploadPartner = uploadPartner;
 module.exports.uploadHero = uploadHero;
+module.exports.uploadPassport = uploadPassport;

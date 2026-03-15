@@ -1,0 +1,66 @@
+<div class="sd-page">
+  <h1 class="sd-page__title">Learning</h1>
+  <% if (application) { %>
+  <p class="sd-page__meta"><%= application.firstname %> <%= application.lastname %> · <%= application.applicationId %></p>
+  <% } %>
+
+  <% if (application) { %>
+  <section class="sd-section">
+    <h2 class="sd-section__title">Your journey</h2>
+    <p class="sd-section__desc">Application progress and current stage.</p>
+    <div class="sd-section__body">
+      <div class="sd-journey">
+        <% journeySteps.forEach(function(step, i) { %>
+        <div class="sd-journey__step <%= step.isActive ? 'sd-journey__step--active' : '' %> <%= step.isPast ? 'sd-journey__step--past' : '' %>">
+          <span class="sd-journey__marker"><% if (step.isPast) { %><i data-lucide="check"></i><% } else { %><span class="sd-journey__dot"></span><% } %></span>
+          <span class="sd-journey__label"><%= step.short %></span>
+        </div><% if (i < journeySteps.length - 1) { %><span class="sd-journey__connector"></span><% } %>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <section class="sd-section">
+    <h2 class="sd-section__title"><%= nextSteps.title %></h2>
+    <p class="sd-section__desc">What to expect next.</p>
+    <div class="sd-section__body">
+      <ul class="sd-list">
+        <% nextSteps.items.forEach(function(item) { %>
+        <li class="sd-list__item"><i data-lucide="chevron-right"></i> <%= item %></li>
+        <% }); %>
+      </ul>
+    </div>
+  </section>
+
+  <section class="sd-section">
+    <h2 class="sd-section__title">Resources</h2>
+    <p class="sd-section__desc">Links and tools.</p>
+    <div class="sd-section__body">
+      <div class="sd-resources">
+        <a href="/student/dashboard/career-passport?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-resource">
+          <i data-lucide="briefcase"></i>
+          <span class="sd-resource__title">Career Passport</span>
+          <span class="sd-resource__desc">Your verified profile</span>
+        </a>
+        <a href="/how-it-works" class="sd-resource" target="_blank" rel="noopener noreferrer">
+          <i data-lucide="book-open"></i>
+          <span class="sd-resource__title">How it works</span>
+          <span class="sd-resource__desc">Work Experience, Publication, Mobility</span>
+        </a>
+        <a href="/faq" class="sd-resource" target="_blank" rel="noopener noreferrer">
+          <i data-lucide="help-circle"></i>
+          <span class="sd-resource__title">FAQ</span>
+          <span class="sd-resource__desc">Common questions</span>
+        </a>
+        <a href="/contact" class="sd-resource" target="_blank" rel="noopener noreferrer">
+          <i data-lucide="mail"></i>
+          <span class="sd-resource__title">Contact</span>
+          <span class="sd-resource__desc">Get in touch</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+</div>
+
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>

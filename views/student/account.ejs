@@ -1,0 +1,120 @@
+<div class="sd-page">
+  <h1 class="sd-page__title">Edit Account</h1>
+
+  <% if (typeof profileUpdated !== 'undefined' && profileUpdated) { %>
+  <div class="sd-alert sd-alert--success">
+    <i data-lucide="check-circle"></i>
+    <span>Profile updated successfully.</span>
+  </div>
+  <% } %>
+  <% if (typeof profileError !== 'undefined' && profileError) { %>
+  <div class="sd-alert sd-alert--error">
+    <i data-lucide="alert-circle"></i>
+    <span>Could not update profile. First name and last name are required.</span>
+  </div>
+  <% } %>
+  <% if (typeof passportUploaded !== 'undefined' && passportUploaded) { %>
+  <div class="sd-alert sd-alert--success">
+    <i data-lucide="check-circle"></i>
+    <span>Passport photo uploaded successfully.</span>
+  </div>
+  <% } %>
+  <% if (typeof passportError !== 'undefined' && passportError) { %>
+  <div class="sd-alert sd-alert--error">
+    <i data-lucide="alert-circle"></i>
+    <span>Could not upload passport. Please choose an image (JPEG, PNG, GIF or WebP, max 3MB).</span>
+  </div>
+  <% } %>
+
+  <section class="sd-section">
+    <h2 class="sd-section__title">Basic information</h2>
+    <p class="sd-section__desc">Edit your account details and settings.</p>
+    <div class="sd-section__body">
+      <form method="post" action="/student/dashboard/account" class="sd-form">
+        <input type="hidden" name="email" value="<%= application.email %>">
+        <input type="hidden" name="applicationId" value="<%= application.applicationId %>">
+        <div class="sd-form__row">
+          <div class="sd-field">
+            <label class="sd-field__label" for="firstname">First name</label>
+            <input type="text" id="firstname" name="firstname" class="sd-input" required value="<%= application.firstname || '' %>" placeholder="First name">
+          </div>
+          <div class="sd-field">
+            <label class="sd-field__label" for="lastname">Last name</label>
+            <input type="text" id="lastname" name="lastname" class="sd-input" required value="<%= application.lastname || '' %>" placeholder="Last name">
+          </div>
+        </div>
+        <div class="sd-field">
+          <label class="sd-field__label" for="career_goal">Bio / career goal</label>
+          <textarea id="career_goal" name="career_goal" class="sd-input sd-input--textarea" rows="3" placeholder="Bio / career goal..."><%= application.career_goal || '' %></textarea>
+        </div>
+        <div class="sd-field">
+          <label class="sd-field__label" for="work_experience">Work experience</label>
+          <textarea id="work_experience" name="work_experience" class="sd-input sd-input--textarea" rows="4" placeholder="Describe your work experience"><%= application.work_experience || '' %></textarea>
+        </div>
+        <div class="sd-field">
+          <label class="sd-field__label" for="skills_other">Other skills</label>
+          <input type="text" id="skills_other" name="skills_other" class="sd-input" value="<%= application.skills_other || '' %>" placeholder="Other skills">
+        </div>
+        <button type="submit" class="sd-btn sd-btn--primary">Save changes</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="sd-section">
+    <h2 class="sd-section__title">Passport photo</h2>
+    <p class="sd-section__desc">Upload a passport-style photo or profile picture. Used for your career passport and profile.</p>
+    <div class="sd-section__body">
+      <% if (application.passportPhoto) { %>
+      <div class="sd-passport-preview">
+        <img src="<%= application.passportPhoto %>" alt="Passport photo" class="sd-passport-preview__img">
+      </div>
+      <% } %>
+      <form method="post" action="/student/dashboard/account/upload-passport" enctype="multipart/form-data" class="sd-form">
+        <input type="hidden" name="email" value="<%= application.email %>">
+        <input type="hidden" name="applicationId" value="<%= application.applicationId %>">
+        <div class="sd-field">
+          <label class="sd-field__label" for="passport">Choose image</label>
+          <input type="file" id="passport" name="passport" class="sd-input" accept="image/jpeg,image/png,image/gif,image/webp" required>
+        </div>
+        <button type="submit" class="sd-btn sd-btn--primary">Upload passport photo</button>
+      </form>
+    </div>
+  </section>
+
+  <section class="sd-section">
+    <h2 class="sd-section__title">Profile settings</h2>
+    <p class="sd-section__desc">Read-only details from your application. Email and Application ID cannot be changed.</p>
+    <div class="sd-section__body">
+      <div class="sd-detail-grid">
+        <div class="sd-detail">
+          <span class="sd-detail__label">Email</span>
+          <span class="sd-detail__value"><%= application.email %></span>
+        </div>
+        <div class="sd-detail">
+          <span class="sd-detail__label">Application ID</span>
+          <span class="sd-detail__value"><%= application.applicationId %></span>
+        </div>
+        <div class="sd-detail">
+          <span class="sd-detail__label">University</span>
+          <span class="sd-detail__value"><%= application.university %></span>
+        </div>
+        <div class="sd-detail">
+          <span class="sd-detail__label">Level</span>
+          <span class="sd-detail__value"><%= application.level %></span>
+        </div>
+        <div class="sd-detail">
+          <span class="sd-detail__label">Department</span>
+          <span class="sd-detail__value"><%= application.department %></span>
+        </div>
+      </div>
+      <p class="sd-section__cta">
+        <a href="/student/dashboard/password?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-btn sd-btn--secondary">
+          <i data-lucide="lock"></i>
+          Change password
+        </a>
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>

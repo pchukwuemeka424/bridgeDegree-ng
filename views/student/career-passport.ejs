@@ -1,0 +1,73 @@
+<div class="sd-page">
+  <h1 class="sd-page__title">Career Passport</h1>
+  <p class="sd-page__meta">Your verified profile — share with recruiters or save as PDF (Print → Save as PDF).</p>
+
+  <section class="sd-section">
+    <div class="sd-section__body sd-section__body--passport">
+      <div class="sd-cp-card">
+        <div class="sd-cp-card__label">Career Passport</div>
+        <div class="sd-cp-card__inner">
+          <div class="sd-cp-card__header">
+            <div class="sd-cp-card__avatar">
+              <span class="sd-cp-card__initials"><%= (application.firstname || '').charAt(0) %><%= (application.lastname || '').charAt(0) %></span>
+            </div>
+            <div>
+              <div class="sd-cp-card__name"><%= application.firstname %> <%= application.lastname %></div>
+              <div class="sd-cp-card__meta"><%= application.department %><% if (application.level) { %> · <%= application.level %><% } %></div>
+              <div class="sd-cp-card__meta"><%= application.university %></div>
+              <div class="sd-cp-card__id">ID: <%= application.applicationId %></div>
+            </div>
+          </div>
+          <div class="sd-cp-card__badges">
+            <span class="sd-cp-card__badge"><i data-lucide="shield-check"></i> Bridge Degree</span>
+            <span class="sd-cp-card__badge"><i data-lucide="file-check"></i> Application on file</span>
+          </div>
+          <% if (application.career_goal) { %>
+          <div class="sd-cp-card__block">
+            <h4>Career goal</h4>
+            <p><%= application.career_goal %></p>
+          </div>
+          <% } %>
+          <% if (application.work_experience) { %>
+          <div class="sd-cp-card__block">
+            <h4>Work experience</h4>
+            <p><%= application.work_experience %></p>
+          </div>
+          <% } %>
+          <% if (application.skills && application.skills.length) { %>
+          <div class="sd-cp-card__block">
+            <h4>Skills</h4>
+            <p><%= application.skills.join(', ') %><% if (application.skills_other) { %> · <%= application.skills_other %><% } %></p>
+          </div>
+          <% } %>
+          <% if (application.career_fields && application.career_fields.length) { %>
+          <div class="sd-cp-card__block">
+            <h4>Career fields</h4>
+            <p><%= application.career_fields.join(', ') %></p>
+          </div>
+          <% } %>
+          <% if (application.publish_research || application.final_year_project) { %>
+          <div class="sd-cp-card__block">
+            <h4>Research & project</h4>
+            <% if (application.publish_research) { %><p><%= application.publish_research %></p><% } %>
+            <% if (application.final_year_project) { %><p><%= application.final_year_project %></p><% } %>
+          </div>
+          <% } %>
+          <% if (application.long_term_goals && application.long_term_goals.length) { %>
+          <div class="sd-cp-card__block">
+            <h4>Long-term goals</h4>
+            <p><%= application.long_term_goals.join(', ') %></p>
+          </div>
+          <% } %>
+          <div class="sd-cp-card__footer">
+            Generated from Bridge Degree · <%= new Date().toLocaleDateString(undefined, { dateStyle: 'long' }) %>
+          </div>
+        </div>
+      </div>
+      <p class="sd-cp-hint">Use your browser’s <strong>Print</strong> (Ctrl/Cmd + P) and choose “Save as PDF” to download.</p>
+      <a href="/student/dashboard?email=<%= encodeURIComponent(application.email) %>&applicationId=<%= encodeURIComponent(application.applicationId) %>" class="sd-btn sd-btn--primary"><i data-lucide="arrow-left"></i> Back to dashboard</a>
+    </div>
+  </section>
+</div>
+
+<script>if (typeof lucide !== 'undefined') lucide.createIcons();</script>

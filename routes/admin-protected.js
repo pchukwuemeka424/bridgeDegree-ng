@@ -9,6 +9,7 @@ const Partner = require('../models/Partner');
 const HomeHero = require('../models/HomeHero');
 const upload = require('../middleware/upload');
 const { uploadPartner, uploadHero } = require('../middleware/upload');
+const { sendApplicationStatusEmail } = require('../services/email');
 
 const router = express.Router();
 
@@ -83,25 +84,47 @@ router.get('/blog', async (req, res) => {
   }
 });
 
+function slugifyTitle(text) {
+  return String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
+    .replace(/\-\-+/g, '-')
+    .replace(/^-|-$/g, '') || 'post';
+}
+
 router.get('/blog/new', (req, res) => {
+  const error = req.query.error;
   res.render('admin/blog-edit', {
     title: 'New Post',
     layout: 'layout-admin',
     adminPage: 'blog',
     post: null,
+    error: error === 'missing' ? 'Title and content are required.' : error === '1' ? 'Could not create post. Please try again.' : null,
   });
 });
 
 router.post('/blog', upload.single('image'), async (req, res) => {
   try {
     const { title, content, excerpt, published } = req.body || {};
-    if (!title || !content) return res.redirect('/admin/blog/new?error=missing');
+    const titleTrim = (title || '').trim();
+    const contentTrim = (content || '').trim();
+    if (!titleTrim || !contentTrim) return res.redirect('/admin/blog/new?error=missing');
     const image = await getUploadedImageUrl(req.file);
+    const excerptTrim = (excerpt || '').trim().slice(0, 300);
+    let slug = slugifyTitle(titleTrim) + '-' + Date.now().toString(36);
+    let exists = await BlogPost.findOne({ slug });
+    while (exists) {
+      slug = slugifyTitle(titleTrim) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
+      exists = await BlogPost.findOne({ slug });
+    }
     await BlogPost.create({
-      title,
-      content,
-      excerpt: excerpt || content.slice(0, 300),
-      image,
+      title: titleTrim,
+      slug,
+      content: contentTrim,
+      excerpt: excerptTrim || contentTrim.slice(0, 300),
+      image: image || null,
       published: published === 'on' || published === '1',
     });
     res.redirect('/admin/blog');
@@ -200,11 +223,21 @@ router.get('/applications/:id', async (req, res) => {
   }
 });
 
-router.post('/applications/:id/status', (req, res) => {
+router.post('/applications/:id/status', async (req, res) => {
   const { status, redirect } = req.body || {};
   const allowed = APPLICATION_STATUSES;
   if (allowed.includes(status)) {
-    StudentApplication.findByIdAndUpdate(req.params.id, { status }).then(() => {}).catch(() => {});
+    const application = await StudentApplication.findById(req.params.id)
+      .select('email firstname applicationId status')
+      .lean();
+    const previousStatus = application?.status;
+    await StudentApplication.findByIdAndUpdate(req.params.id, { status }).catch(() => {});
+    if (application && previousStatus !== status) {
+      sendApplicationStatusEmail(
+        { email: application.email, firstname: application.firstname, applicationId: application.applicationId },
+        status
+      ).catch((err) => console.error('Status email failed:', err));
+    }
   }
   const goTo = redirect && String(redirect).startsWith('/admin/applications/') ? redirect : '/admin/applications';
   res.redirect(303, goTo);
