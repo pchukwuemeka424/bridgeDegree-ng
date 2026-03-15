@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts');
@@ -174,6 +175,7 @@ app.post('/students/apply', async (req, res) => {
   const toArray = (v) => (Array.isArray(v) ? v : v ? [v] : []);
   try {
     const doc = await StudentApplication.create({
+      applicationId: 'BD-' + crypto.randomBytes(4).toString('hex').toUpperCase(),
       firstname: b.firstname,
       lastname: b.lastname,
       email: (b.email || '').trim().toLowerCase(),

@@ -98,4 +98,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// GET /student/logout — clear client context and redirect to login
+router.get('/logout', (req, res) => {
+  res.redirect(302, '/student/login');
+});
+
 module.exports = router;
