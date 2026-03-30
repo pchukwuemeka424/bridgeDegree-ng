@@ -6,6 +6,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts');
 const { connectDB } = require('./config/db');
+const { stripHtml, renderBlogContent } = require('./utils/html');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -270,11 +271,13 @@ app.get('/blog/:slug', async (req, res) => {
       .select('title slug createdAt image')
       .lean();
     res.locals.currentRoute = 'blog';
+    const plainSnippet = stripHtml(post.content || '').slice(0, 160);
     res.render('blog-single', {
       title: post.title,
       breadcrumb: [{ path: '/', label: 'Home' }, { path: '/blog', label: 'Blog' }, { label: post.title }],
-      metaDescription: post.excerpt || post.content.slice(0, 160),
+      metaDescription: post.excerpt || plainSnippet,
       post,
+      contentHtml: renderBlogContent(post.content),
       recentPosts,
     });
   } catch (err) {

@@ -10,6 +10,7 @@ const HomeHero = require('../models/HomeHero');
 const upload = require('../middleware/upload');
 const { uploadPartner, uploadHero } = require('../middleware/upload');
 const { sendApplicationStatusEmail } = require('../services/email');
+const { stripHtml } = require('../utils/html');
 
 const router = express.Router();
 
@@ -100,6 +101,7 @@ router.get('/blog/new', (req, res) => {
     title: 'New Post',
     layout: 'layout-admin',
     adminPage: 'blog',
+    useQuill: true,
     post: null,
     error: error === 'missing' ? 'Title and content are required.' : error === '1' ? 'Could not create post. Please try again.' : null,
   });
@@ -119,11 +121,12 @@ router.post('/blog', upload.single('image'), async (req, res) => {
       slug = slugifyTitle(titleTrim) + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
       exists = await BlogPost.findOne({ slug });
     }
+    const excerptFromContent = stripHtml(contentTrim).slice(0, 300);
     await BlogPost.create({
       title: titleTrim,
       slug,
       content: contentTrim,
-      excerpt: excerptTrim || contentTrim.slice(0, 300),
+      excerpt: excerptTrim || excerptFromContent,
       image: image || null,
       published: published === 'on' || published === '1',
     });
@@ -138,7 +141,7 @@ router.get('/blog/:id/edit', async (req, res) => {
   try {
     const post = await BlogPost.findById(req.params.id).lean();
     if (!post) return res.redirect('/admin/blog');
-    res.render('admin/blog-edit', { title: 'Edit Post', layout: 'layout-admin', adminPage: 'blog', post });
+    res.render('admin/blog-edit', { title: 'Edit Post', layout: 'layout-admin', adminPage: 'blog', useQuill: true, post });
   } catch (err) {
     res.redirect('/admin/blog');
   }

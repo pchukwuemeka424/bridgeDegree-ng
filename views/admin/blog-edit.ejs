@@ -20,9 +20,12 @@
       <label for="excerpt">Excerpt (short summary)</label>
       <textarea id="excerpt" name="excerpt" placeholder="Optional"><%= post ? (post.excerpt || '') : '' %></textarea>
     </div>
-    <div class="admin-form-group">
-      <label for="content">Content *</label>
-      <textarea id="content" name="content" required style="min-height: 280px;"><%= post ? (post.content || '') : '' %></textarea>
+    <div class="admin-form-group admin-form-group--quill">
+      <label for="blog-editor">Content *</label>
+      <p class="admin-form-hint">Use the toolbar for bold, links, lists, and headings.</p>
+      <div id="blog-editor" class="admin-quill-editor" aria-label="Post content"></div>
+      <input type="hidden" name="content" id="content-input" value="">
+      <script type="application/json" id="blog-initial-json"><%- JSON.stringify(post ? (post.content || '') : '') %></script>
     </div>
     <div class="admin-form-group">
       <label for="image">Image</label>
@@ -37,3 +40,49 @@
     <button type="submit" class="admin-btn admin-btn-primary"><%= post ? 'Update' : 'Create' %> post</button>
   </form>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script>
+<script>
+(function () {
+  var el = document.getElementById('blog-editor');
+  var input = document.getElementById('content-input');
+  var jsonEl = document.getElementById('blog-initial-json');
+  if (!el || !input || typeof Quill === 'undefined') return;
+
+  var toolbarOptions = [
+    [{ header: [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ list: 'ordered' }, { list: 'bullet' }],
+    ['blockquote', 'link'],
+    ['clean']
+  ];
+
+  var quill = new Quill('#blog-editor', {
+    theme: 'snow',
+    placeholder: 'Write your post…',
+    modules: {
+      toolbar: toolbarOptions
+    }
+  });
+
+  try {
+    var initial = jsonEl ? JSON.parse(jsonEl.textContent || '""') : '';
+    if (initial) {
+      quill.clipboard.dangerouslyPasteHTML(initial);
+    }
+  } catch (e) {}
+
+  var form = el.closest('form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      var text = quill.getText().replace(/\u00a0/g, ' ').trim();
+      if (!text) {
+        e.preventDefault();
+        alert('Please add some content for the post.');
+        quill.focus();
+        return;
+      }
+      input.value = quill.root.innerHTML;
+    });
+  }
+})();
+</script>

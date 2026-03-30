@@ -459,3 +459,36 @@
 .admin-login__links a { color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.875rem; }
 .admin-login__links a:hover { text-decoration: underline; }
 .admin-login__links span { color: rgba(255,255,255,0.5); margin: 0 8px; }
+
+/* Blog post editor (Quill) */
+.admin-form-hint {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0 0 10px;
+  line-height: 1.4;
+}
+.admin-form-group--quill .admin-quill-editor {
+  border-radius: 10px;
+  overflow: hidden;
+}
+.admin-form-group--quill .ql-toolbar.ql-snow {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px 10px 0 0;
+  background: #f8fafc;
+  font-family: 'Outfit', sans-serif;
+}
+.admin-form-group--quill .ql-container.ql-snow {
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  min-height: 280px;
+}
+.admin-form-group--quill .ql-editor {
+  min-height: 280px;
+}
+.admin-form-group--quill .ql-editor.ql-blank::before {
+  font-style: normal;
+  color: #94a3b8;
+}
