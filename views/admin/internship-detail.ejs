@@ -1,0 +1,251 @@
+<% 
+  var rm = typeof rosterMeta !== 'undefined' && rosterMeta ? rosterMeta : {};
+  var qParam = function(extra) {
+    var p = new URLSearchParams();
+    if (rm.q) p.set('q', rm.q);
+    if (rm.pool && rm.pool !== 'all') p.set('pool', rm.pool);
+    if (rm.status) p.set('status', rm.status);
+    if (rm.page && rm.page > 1) p.set('page', String(rm.page));
+    if (rm.assignedStatus) p.set('assignedStatus', rm.assignedStatus);
+    if (extra && typeof extra === 'object') {
+      Object.keys(extra).forEach(function(k) {
+        var v = extra[k];
+        if (v === '' || v == null) p.delete(k);
+        else if (k === 'pool' && String(v) === 'all') p.delete('pool');
+        else p.set(k, String(v));
+      });
+    }
+    if (p.get('page') === '1') p.delete('page');
+    var s = p.toString();
+    return s ? ('?' + s) : '';
+  };
+%>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / <a href="/admin/internships">Internships</a> / <%= internship.title %></nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="briefcase"></i> <%= internship.title %></h1>
+  <p class="admin-page-desc">
+    <strong><%= typeof studentCount !== 'undefined' ? studentCount : 0 %></strong> student<%= (studentCount === 1) ? '' : 's' %> on this placement
+    <% if (internship.category && internship.category.name) { %> · Category: <%= internship.category.name %><% } %>
+    <% if (!internship.active) { %>
+    <span class="admin-badge admin-badge-draft" style="margin-left:8px;">Inactive — new assignments are blocked</span>
+    <% } %>
+  </p>
+</div>
+
+<% if (typeof notice !== 'undefined' && notice === 'assigned') { %>
+<div class="admin-card admin-flash admin-flash--success" style="padding:14px 20px; margin-bottom:16px; border-color:#86efac; background:#f0fdf4;">
+  <strong>Assigned</strong> — student added to this internship.
+</div>
+<% } %>
+<% if (typeof notice !== 'undefined' && notice === 'unassigned') { %>
+<div class="admin-card admin-flash admin-flash--success" style="padding:14px 20px; margin-bottom:16px; border-color:#86efac; background:#f0fdf4;">
+  <strong>Removed</strong> — student is no longer on this placement.
+</div>
+<% } %>
+<% if (typeof notice !== 'undefined' && notice === 'bulk') { %>
+<div class="admin-card admin-flash admin-flash--success" style="padding:14px 20px; margin-bottom:16px; border-color:#86efac; background:#f0fdf4;">
+  <strong>Bulk assign</strong> — <%= typeof bulkCount === 'number' ? bulkCount : 0 %> added<% if (typeof bulkSkipped === 'number' && bulkSkipped > 0) { %>, <%= bulkSkipped %> skipped (already here, inactive placement, or not found)<% } %>.
+</div>
+<% } %>
+<% if (typeof assignErr !== 'undefined' && assignErr) { %>
+<div class="admin-card admin-flash admin-flash--error" style="padding:14px 20px; margin-bottom:16px; border-color:#fecaca; background:#fef2f2; color:#991b1b;">
+  <% if (assignErr === 'inactive') { %><strong>Cannot assign</strong> — this internship is inactive. Activate it under Edit first.<% } %>
+  <% if (assignErr === 'notfound') { %><strong>Applicant not found.</strong><% } %>
+  <% if (assignErr === 'already') { %><strong>Already assigned</strong> — this student is already on this placement.<% } %>
+  <% if (assignErr === 'invalid') { %><strong>Invalid request.</strong><% } %>
+  <% if (assignErr === 'noselection') { %><strong>No rows selected</strong> — tick one or more applicants, then use Assign selected.<% } %>
+  <% if (assignErr === 'unassign_mismatch') { %><strong>Could not remove</strong> — student is not on this placement (refresh and try again).<% } %>
+  <% if (assignErr === 'server') { %><strong>Something went wrong.</strong> Try again.<% } %>
+  <% if (!['inactive','notfound','already','invalid','noselection','unassign_mismatch','server'].includes(assignErr)) { %><strong>Error:</strong> <%= assignErr %><% } %>
+</div>
+<% } %>
+
+<div class="admin-actions">
+  <a href="/admin/internships#assign-students-panel" class="admin-btn admin-btn-secondary"><i data-lucide="layout-grid"></i> Main assign tool</a>
+  <a href="/admin/internships/<%= internship._id %>/edit" class="admin-btn admin-btn-secondary">Edit internship</a>
+  <a href="/admin/internships" class="admin-btn admin-btn-secondary">All internships</a>
+</div>
+<%- include('partials/internship-assign-howto') %>
+
+<% if (internship.description) { %>
+<div class="admin-card">
+  <h2 class="admin-card__title">Description</h2>
+  <p style="margin: 0; white-space: pre-wrap; color: #334155; line-height: 1.6;"><%= internship.description %></p>
+</div>
+<% } %>
+
+<div class="admin-card">
+  <h2 class="admin-card__title">Assigned students</h2>
+  <p class="admin-table-summary">Remove someone to free their slot or move them via another internship’s roster. Filter the table by application status.</p>
+  <div class="admin-applications-toolbar" style="margin-bottom:16px;">
+    <div class="admin-applications-filters">
+      <span class="admin-filters-label">Status:</span>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ assignedStatus: '', page: 1 }) %>" class="admin-filter-pill<%= !rm.assignedStatus ? ' admin-filter-pill--active' : '' %>">All</a>
+      <% if (typeof applicationStatuses !== 'undefined' && applicationStatuses) { applicationStatuses.forEach(function(st) { %>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ assignedStatus: st, page: 1 }) %>" class="admin-filter-pill<%= rm.assignedStatus === st ? ' admin-filter-pill--active' : '' %>"><%= st.replace('_', ' ') %></a>
+      <% }); } %>
+    </div>
+  </div>
+  <% if (assigned && assigned.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Application ID</th>
+        <th>University / Dept</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% assigned.forEach(function(s) { %>
+      <tr>
+        <td><a href="/admin/applications/<%= s._id %>" class="admin-table-id"><%= s.firstname %> <%= s.lastname %></a></td>
+        <td><code style="font-size: 0.85em;"><%= s.applicationId %></code></td>
+        <td><%= s.university || '—' %><% if (s.department) { %><br><span style="color:#64748b;font-size:0.85em;"><%= s.department %></span><% } %></td>
+        <td><%= s.email %></td>
+        <td><span class="admin-badge admin-badge-<%= s.status %>"><%= s.status.replace('_', ' ') %></span></td>
+        <td class="actions">
+          <form method="post" action="/admin/internships/<%= internship._id %>/unassign" style="display:inline;">
+            <input type="hidden" name="studentId" value="<%= s._id %>">
+            <input type="hidden" name="q" value="<%= rm.q || '' %>">
+            <input type="hidden" name="pool" value="<%= rm.pool || 'all' %>">
+            <input type="hidden" name="status" value="<%= rm.status || '' %>">
+            <input type="hidden" name="page" value="<%= rm.page || 1 %>">
+            <input type="hidden" name="assignedStatus" value="<%= rm.assignedStatus || '' %>">
+            <button type="submit" class="admin-btn admin-btn-danger">Remove</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p class="admin-empty-state"><%= rm.assignedStatus ? 'No assigned students match this status filter.' : 'No students assigned yet. Add applicants below.' %></p>
+  <% } %>
+</div>
+
+<div class="admin-card">
+  <h2 class="admin-card__title">Add students</h2>
+  <p class="admin-table-summary">Search by name, email, application ID, university, or department. Use <strong>Unplaced only</strong> to show applicants not on any internship yet. Assigning from another internship <strong>moves</strong> them here. Inactive internships cannot receive new assignments.</p>
+
+  <form method="get" action="/admin/internships/<%= internship._id %>" class="admin-applications-search" style="margin-bottom: 16px; flex-wrap: wrap;">
+    <input type="text" name="q" class="admin-input" placeholder="Search applicants…" value="<%= rm.q || '' %>">
+    <input type="hidden" name="pool" value="<%= rm.pool || 'all' %>">
+    <input type="hidden" name="status" value="<%= rm.status || '' %>">
+    <input type="hidden" name="assignedStatus" value="<%= rm.assignedStatus || '' %>">
+    <button type="submit" class="admin-btn admin-btn-secondary">Search</button>
+  </form>
+
+  <div class="admin-applications-toolbar" style="margin-bottom:12px;">
+    <div class="admin-applications-filters" style="margin-bottom:10px;">
+      <span class="admin-filters-label">Pool:</span>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ pool: 'all', page: 1 }) %>" class="admin-filter-pill<%= rm.pool !== 'unplaced' ? ' admin-filter-pill--active' : '' %>">All eligible</a>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ pool: 'unplaced', page: 1 }) %>" class="admin-filter-pill<%= rm.pool === 'unplaced' ? ' admin-filter-pill--active' : '' %>">Unplaced only</a>
+    </div>
+    <div class="admin-applications-filters">
+      <span class="admin-filters-label">Application status:</span>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ status: '', page: 1 }) %>" class="admin-filter-pill<%= !rm.status ? ' admin-filter-pill--active' : '' %>">Any</a>
+      <% if (typeof applicationStatuses !== 'undefined' && applicationStatuses) { applicationStatuses.forEach(function(st) { %>
+      <a href="/admin/internships/<%= internship._id %><%= qParam({ status: st, page: 1 }) %>" class="admin-filter-pill<%= rm.status === st ? ' admin-filter-pill--active' : '' %>"><%= st.replace('_', ' ') %></a>
+      <% }); } %>
+    </div>
+  </div>
+
+  <% var totalP = rm.totalPages || 1; var curP = rm.page || 1; var fromN = rm.totalCandidates ? ((curP - 1) * (rm.limit || 25) + 1) : 0; var toN = Math.min(curP * (rm.limit || 25), rm.totalCandidates || 0); %>
+  <% if (rm.totalCandidates > 0) { %>
+  <p class="admin-table-summary">Showing <%= fromN %>–<%= toN %> of <strong><%= rm.totalCandidates %></strong> matching applicants.</p>
+  <div class="admin-actions" style="margin-bottom:14px;">
+    <% if (curP > 1) { %>
+    <a href="/admin/internships/<%= internship._id %><%= qParam({ page: curP - 1 }) %>" class="admin-btn admin-btn-secondary">Previous page</a>
+    <% } %>
+    <% if (curP < totalP) { %>
+    <a href="/admin/internships/<%= internship._id %><%= qParam({ page: curP + 1 }) %>" class="admin-btn admin-btn-secondary">Next page</a>
+    <% } %>
+    <span style="font-size:0.9rem;color:#64748b;align-self:center;">Page <%= curP %> / <%= totalP %></span>
+  </div>
+  <% } %>
+
+  <% if (candidates && candidates.length) { %>
+  <form method="post" action="/admin/internships/<%= internship._id %>/assign-bulk" id="internship-bulk-assign">
+    <input type="hidden" name="q" value="<%= rm.q || '' %>">
+    <input type="hidden" name="pool" value="<%= rm.pool || 'all' %>">
+    <input type="hidden" name="status" value="<%= rm.status || '' %>">
+    <input type="hidden" name="page" value="<%= rm.page || 1 %>">
+    <input type="hidden" name="assignedStatus" value="<%= rm.assignedStatus || '' %>">
+    <div class="admin-actions" style="margin-bottom:12px;">
+      <button type="submit" class="admin-btn admin-btn-primary" <%= internship.active ? '' : 'disabled title="Activate internship to assign"' %>><i data-lucide="user-plus"></i> Assign selected</button>
+      <button type="button" class="admin-btn admin-btn-secondary" id="internship-select-all">Select all on page</button>
+      <button type="button" class="admin-btn admin-btn-secondary" id="internship-select-none">Clear selection</button>
+    </div>
+  </form>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th style="width:40px;"><span class="admin-sr-only">Select</span></th>
+        <th>Name</th>
+        <th>Application ID</th>
+        <th>University / Level</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Current placement</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% candidates.forEach(function(s) { %>
+      <tr>
+        <td>
+          <input type="checkbox" name="studentIds" value="<%= s._id %>" class="internship-candidate-cb" form="internship-bulk-assign" <%= internship.active ? '' : 'disabled' %>>
+        </td>
+        <td><a href="/admin/applications/<%= s._id %>" class="admin-table-id"><%= s.firstname %> <%= s.lastname %></a></td>
+        <td><code style="font-size: 0.85em;"><%= s.applicationId %></code></td>
+        <td><%= s.university || '—' %><% if (s.level) { %><br><span style="color:#64748b;font-size:0.85em;"><%= s.level %></span><% } %></td>
+        <td><%= s.email %></td>
+        <td><span class="admin-badge admin-badge-<%= s.status %>"><%= s.status.replace('_', ' ') %></span></td>
+        <td><%= s.internship && s.internship.title ? s.internship.title : (s.internship ? 'Other' : '—') %></td>
+        <td class="actions">
+          <form method="post" action="/admin/internships/<%= internship._id %>/assign" style="display:inline;">
+            <input type="hidden" name="studentId" value="<%= s._id %>">
+            <input type="hidden" name="q" value="<%= rm.q || '' %>">
+            <input type="hidden" name="pool" value="<%= rm.pool || 'all' %>">
+            <input type="hidden" name="status" value="<%= rm.status || '' %>">
+            <input type="hidden" name="page" value="<%= rm.page || 1 %>">
+            <input type="hidden" name="assignedStatus" value="<%= rm.assignedStatus || '' %>">
+            <button type="submit" class="admin-btn admin-btn-primary" <%= internship.active ? '' : 'disabled' %>>Assign here</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <script>
+  (function () {
+    var form = document.getElementById('internship-bulk-assign');
+    if (!form) return;
+    var boxes = function () { return document.querySelectorAll('.internship-candidate-cb'); };
+    var allBtn = document.getElementById('internship-select-all');
+    var noneBtn = document.getElementById('internship-select-none');
+    var title = <%- JSON.stringify(internship.title || 'this placement') %>;
+    if (allBtn) allBtn.addEventListener('click', function () {
+      boxes().forEach(function (cb) { if (!cb.disabled) cb.checked = true; });
+    });
+    if (noneBtn) noneBtn.addEventListener('click', function () {
+      boxes().forEach(function (cb) { cb.checked = false; });
+    });
+    form.addEventListener('submit', function (e) {
+      var n = document.querySelectorAll('.internship-candidate-cb:checked').length;
+      if (n === 0) return;
+      if (!confirm('Assign ' + n + ' student(s) to “' + title + '”?')) e.preventDefault();
+    });
+  })();
+  </script>
+  <% } else { %>
+  <p class="admin-empty-state"><%= (rm.q || rm.status || rm.pool === 'unplaced') ? 'No matching applicants for these filters (or everyone is already on this internship).' : 'Use search or filters above to find applicants, or open the next page if available.' %></p>
+  <% } %>
+</div>
+
+<style>
+.admin-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+</style>

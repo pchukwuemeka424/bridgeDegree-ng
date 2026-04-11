@@ -33,6 +33,38 @@
       <div class="label">Partners</div>
     </div>
   </div>
+  <div class="admin-stat">
+    <div class="admin-stat__icon admin-stat__icon--orange"><i data-lucide="briefcase"></i></div>
+    <div class="admin-stat__content">
+      <div class="num"><%= typeof internshipCount !== 'undefined' ? internshipCount : 0 %></div>
+      <div class="label">Internships</div>
+    </div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__icon admin-stat__icon--green"><i data-lucide="user-check"></i></div>
+    <div class="admin-stat__content">
+      <div class="num"><%= typeof studentsInInternshipsCount !== 'undefined' ? studentsInInternshipsCount : 0 %></div>
+      <div class="label">Students placed</div>
+    </div>
+  </div>
+  <div class="admin-stat">
+    <div class="admin-stat__icon admin-stat__icon--purple"><i data-lucide="user-x"></i></div>
+    <div class="admin-stat__content">
+      <div class="num"><%= typeof unplacedApplicantsCount !== 'undefined' ? unplacedApplicantsCount : 0 %></div>
+      <div class="label">Applicants unplaced</div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-card">
+  <h2 class="admin-card__title">Internship placements</h2>
+  <p class="admin-table-summary" style="margin-top:0;">Assign applicants to structured placements from the Internships screen (bulk + search) or from each applicant’s profile.</p>
+  <div class="admin-actions" style="margin-bottom:12px;">
+    <a href="/admin/internships#assign-students-panel" class="admin-btn admin-btn-primary"><i data-lucide="user-plus"></i> Assign students</a>
+    <a href="/admin/internships" class="admin-btn admin-btn-secondary">All internships</a>
+    <a href="/admin/applications" class="admin-btn admin-btn-secondary">Applications list</a>
+  </div>
+  <%- include('partials/internship-assign-howto') %>
 </div>
 
 <div class="admin-card">
@@ -46,5 +78,7 @@
     <a href="/admin/partners" class="admin-btn admin-btn-secondary">Manage partners</a>
     <a href="/admin/hero" class="admin-btn admin-btn-secondary">Edit home hero</a>
     <a href="/admin/applications" class="admin-btn admin-btn-secondary">View applications</a>
+    <a href="/admin/internship-categories" class="admin-btn admin-btn-secondary">Internship categories</a>
+    <a href="/admin/internships" class="admin-btn admin-btn-secondary">Internships &amp; placements</a>
   </div>
 </div>

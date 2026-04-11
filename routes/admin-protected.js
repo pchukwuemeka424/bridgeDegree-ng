@@ -1,18 +1,114 @@
 'use strict';
 
 const express = require('express');
+const mongoose = require('mongoose');
 const { put: putBlob } = require('@vercel/blob');
 const BlogPost = require('../models/BlogPost');
 const StudentApplication = require('../models/StudentApplication');
 const Testimonial = require('../models/Testimonial');
 const Partner = require('../models/Partner');
 const HomeHero = require('../models/HomeHero');
+const InternshipCategory = require('../models/InternshipCategory');
+const Internship = require('../models/Internship');
 const upload = require('../middleware/upload');
 const { uploadPartner, uploadHero } = require('../middleware/upload');
-const { sendApplicationStatusEmail } = require('../services/email');
+const { sendApplicationStatusEmail, sendPlacementAssignedEmail } = require('../services/email');
 const { stripHtml } = require('../utils/html');
 
 const router = express.Router();
+
+const APPLICATION_STATUSES = ['submitted', 'under_review', 'shortlisted', 'accepted', 'rejected'];
+
+function parseBodyStudentIds(body) {
+  const raw = body && body.studentIds;
+  if (raw == null || raw === '') return [];
+  const arr = Array.isArray(raw) ? raw : [raw];
+  return arr.map((id) => String(id).trim()).filter((id) => mongoose.Types.ObjectId.isValid(id));
+}
+
+/** Preserve internship roster list filters in redirects (GET query or POST body). */
+function internshipRosterQuerySuffix(source) {
+  const p = new URLSearchParams();
+  const q = source && source.q != null ? String(source.q).trim() : '';
+  const pool = source && source.pool != null ? String(source.pool).trim() : '';
+  const status = source && source.status != null ? String(source.status).trim() : '';
+  const page = source && source.page != null ? String(source.page).trim() : '';
+  const assignedStatus =
+    source && source.assignedStatus != null ? String(source.assignedStatus).trim() : '';
+  if (q) p.set('q', q);
+  if (pool && pool !== 'all') p.set('pool', pool);
+  if (status && APPLICATION_STATUSES.includes(status)) p.set('status', status);
+  if (page && page !== '1') p.set('page', page);
+  if (assignedStatus && APPLICATION_STATUSES.includes(assignedStatus)) {
+    p.set('assignedStatus', assignedStatus);
+  }
+  const s = p.toString();
+  return s ? `?${s}` : '';
+}
+
+async function assignStudentToInternship(internshipId, studentId) {
+  if (!mongoose.Types.ObjectId.isValid(internshipId) || !mongoose.Types.ObjectId.isValid(studentId)) {
+    return { ok: false, code: 'invalid' };
+  }
+  const internship = await Internship.findById(internshipId)
+    .select('_id active title')
+    .populate('category', 'name')
+    .lean();
+  if (!internship) return { ok: false, code: 'no_internship' };
+  if (!internship.active) return { ok: false, code: 'inactive' };
+  const student = await StudentApplication.findById(studentId)
+    .select('_id internship email firstname applicationId')
+    .lean();
+  if (!student) return { ok: false, code: 'notfound' };
+  if (student.internship && String(student.internship) === String(internship._id)) {
+    return { ok: false, code: 'already' };
+  }
+  await StudentApplication.findByIdAndUpdate(studentId, { internship: internship._id });
+  sendPlacementAssignedEmail(
+    {
+      email: student.email,
+      firstname: student.firstname,
+      applicationId: student.applicationId,
+    },
+    internship
+  ).catch((err) => console.error('Placement assigned email failed:', err));
+  return { ok: true };
+}
+
+/** Applicant list for “assign from internships index” (exclude only those already on target placement). */
+function buildPickStudentsQuery(targetInternshipId, opts) {
+  const pickQ = (opts.pickQ || '').trim();
+  const pickPool = opts.pickPool === 'unplaced' ? 'unplaced' : 'all';
+  const pickStatus =
+    opts.pickStatus && APPLICATION_STATUSES.includes(String(opts.pickStatus).trim())
+      ? String(opts.pickStatus).trim()
+      : '';
+  const targetOid = new mongoose.Types.ObjectId(targetInternshipId);
+  const clauses = [];
+  if (pickPool === 'unplaced') {
+    clauses.push({ internship: null });
+  } else {
+    clauses.push({ internship: { $ne: targetOid } });
+  }
+  if (pickStatus) {
+    clauses.push({ status: pickStatus });
+  }
+  if (pickQ) {
+    const escaped = String(pickQ).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const re = new RegExp(escaped, 'i');
+    clauses.push({
+      $or: [
+        { firstname: { $regex: re } },
+        { lastname: { $regex: re } },
+        { email: { $regex: re } },
+        { applicationId: { $regex: re } },
+        { university: { $regex: re } },
+        { department: { $regex: re } },
+      ],
+    });
+  }
+  return clauses.length === 1 ? clauses[0] : { $and: clauses };
+}
 
 async function getUploadedImageUrl(file) {
   if (!file) return null;
@@ -49,11 +145,22 @@ async function getHeroImageUrl(file) {
 
 router.get('/', async (req, res) => {
   try {
-    const [postCount, applicationCount, testimonialCount, partnerCount] = await Promise.all([
+    const [
+      postCount,
+      applicationCount,
+      testimonialCount,
+      partnerCount,
+      internshipCount,
+      studentsInInternshipsCount,
+      unplacedApplicantsCount,
+    ] = await Promise.all([
       BlogPost.countDocuments(),
       StudentApplication.countDocuments(),
       Testimonial.countDocuments(),
       Partner.countDocuments(),
+      Internship.countDocuments(),
+      StudentApplication.countDocuments({ internship: { $ne: null } }),
+      StudentApplication.countDocuments({ internship: null }),
     ]);
     res.render('admin/dashboard', {
       title: 'Admin Dashboard',
@@ -63,6 +170,9 @@ router.get('/', async (req, res) => {
       applicationCount,
       testimonialCount,
       partnerCount,
+      internshipCount,
+      studentsInInternshipsCount,
+      unplacedApplicantsCount,
     });
   } catch (err) {
     console.error(err);
@@ -170,8 +280,6 @@ router.post('/blog/:id/delete', (req, res) => {
   res.redirect('/admin/blog');
 });
 
-const APPLICATION_STATUSES = ['submitted', 'under_review', 'shortlisted', 'accepted', 'rejected'];
-
 router.get('/applications', async (req, res) => {
   try {
     const statusFilter = req.query.status;
@@ -191,7 +299,10 @@ router.get('/applications', async (req, res) => {
         { university: { $regex: re } },
       ];
     }
-    const applications = await StudentApplication.find(query).sort({ submittedAt: -1 }).lean();
+    const applications = await StudentApplication.find(query)
+      .sort({ submittedAt: -1 })
+      .populate('internship', 'title active')
+      .lean();
     const counts = await StudentApplication.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]).then((arr) => Object.fromEntries(arr.map((x) => [x._id, x.count])));
@@ -212,18 +323,67 @@ router.get('/applications', async (req, res) => {
 
 router.get('/applications/:id', async (req, res) => {
   try {
-    const application = await StudentApplication.findById(req.params.id).lean();
+    const application = await StudentApplication.findById(req.params.id)
+      .populate({
+        path: 'internship',
+        select: 'title category',
+        populate: { path: 'category', select: 'name' },
+      })
+      .lean();
     if (!application) return res.redirect('/admin/applications');
+    const internships = await Internship.find()
+      .sort({ sortOrder: 1, title: 1 })
+      .populate('category', 'name')
+      .lean();
     res.render('admin/application-detail', {
       title: 'Application ' + (application.applicationId || application._id),
       layout: 'layout-admin',
       adminPage: 'applications',
       application,
+      internships: internships || [],
     });
   } catch (err) {
     console.error(err);
     res.redirect('/admin/applications');
   }
+});
+
+router.post('/applications/:id/internship', async (req, res) => {
+  const raw = req.body && req.body.internshipId != null ? String(req.body.internshipId).trim() : '';
+  let internshipId = null;
+  if (raw && mongoose.Types.ObjectId.isValid(raw)) {
+    const exists = await Internship.findById(raw).select('_id').lean();
+    if (exists) internshipId = exists._id;
+  }
+  try {
+    const prev = await StudentApplication.findById(req.params.id)
+      .select('internship email firstname applicationId')
+      .lean();
+    await StudentApplication.findByIdAndUpdate(req.params.id, { internship: internshipId });
+    if (internshipId && prev) {
+      const nextStr = String(internshipId);
+      const prevStr = prev.internship ? String(prev.internship) : '';
+      if (nextStr !== prevStr) {
+        const placement = await Internship.findById(internshipId)
+          .select('title')
+          .populate('category', 'name')
+          .lean();
+        if (placement) {
+          sendPlacementAssignedEmail(
+            {
+              email: prev.email,
+              firstname: prev.firstname,
+              applicationId: prev.applicationId,
+            },
+            placement
+          ).catch((err) => console.error('Placement assigned email failed:', err));
+        }
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+  res.redirect(303, '/admin/applications/' + req.params.id);
 });
 
 router.post('/applications/:id/status', async (req, res) => {
@@ -472,6 +632,549 @@ router.post('/hero', uploadHero.single('bgImageFile'), async (req, res) => {
     console.error(err);
     res.redirect('/admin/hero');
   }
+});
+
+// ——— Internship categories ———
+router.get('/internship-categories', async (req, res) => {
+  try {
+    const categories = await InternshipCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
+    const internshipCounts = await Internship.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+    ]);
+    const countByCategory = Object.fromEntries(
+      internshipCounts.map((x) => [String(x._id), x.count])
+    );
+    res.render('admin/internship-category-list', {
+      title: 'Internship categories',
+      layout: 'layout-admin',
+      adminPage: 'internship_categories',
+      categories,
+      countByCategory,
+      listError: req.query.error === 'in_use' ? 'Cannot delete a category that still has internships. Reassign or delete those internships first.' : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+});
+
+router.get('/internship-categories/new', (req, res) => {
+  res.render('admin/internship-category-edit', {
+    title: 'New internship category',
+    layout: 'layout-admin',
+    adminPage: 'internship_categories',
+    category: null,
+    error: null,
+  });
+});
+
+router.post('/internship-categories', async (req, res) => {
+  try {
+    const { name, description, sortOrder, active } = req.body || {};
+    const nameTrim = (name || '').trim();
+    if (!nameTrim) {
+      return res.render('admin/internship-category-edit', {
+        title: 'New internship category',
+        layout: 'layout-admin',
+        adminPage: 'internship_categories',
+        category: null,
+        error: 'Name is required.',
+      });
+    }
+    await InternshipCategory.create({
+      name: nameTrim,
+      description: (description || '').trim(),
+      sortOrder: parseInt(sortOrder, 10) || 0,
+      active: active === 'on' || active === '1',
+    });
+    res.redirect('/admin/internship-categories');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internship-categories/new');
+  }
+});
+
+router.get('/internship-categories/:id/edit', async (req, res) => {
+  try {
+    const category = await InternshipCategory.findById(req.params.id).lean();
+    if (!category) return res.redirect('/admin/internship-categories');
+    res.render('admin/internship-category-edit', {
+      title: 'Edit category',
+      layout: 'layout-admin',
+      adminPage: 'internship_categories',
+      category,
+      error: null,
+    });
+  } catch (err) {
+    res.redirect('/admin/internship-categories');
+  }
+});
+
+router.post('/internship-categories/:id', async (req, res) => {
+  try {
+    const category = await InternshipCategory.findById(req.params.id);
+    if (!category) return res.redirect('/admin/internship-categories');
+    const { name, description, sortOrder, active } = req.body || {};
+    const nameTrim = (name || '').trim();
+    if (!nameTrim) {
+      const catLean = category.toObject();
+      return res.render('admin/internship-category-edit', {
+        title: 'Edit category',
+        layout: 'layout-admin',
+        adminPage: 'internship_categories',
+        category: catLean,
+        error: 'Name is required.',
+      });
+    }
+    category.name = nameTrim;
+    category.description = (description || '').trim();
+    category.sortOrder = parseInt(sortOrder, 10) || 0;
+    category.active = active === 'on' || active === '1';
+    await category.save();
+    res.redirect('/admin/internship-categories');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internship-categories');
+  }
+});
+
+router.post('/internship-categories/:id/delete', async (req, res) => {
+  try {
+    const n = await Internship.countDocuments({ category: req.params.id });
+    if (n > 0) {
+      return res.redirect(303, '/admin/internship-categories?error=in_use');
+    }
+    await InternshipCategory.findByIdAndDelete(req.params.id);
+  } catch (err) {
+    console.error(err);
+  }
+  res.redirect(303, '/admin/internship-categories');
+});
+
+// ——— Internships ———
+router.get('/internships', async (req, res) => {
+  try {
+    const categoryFilter = (req.query.category || '').trim();
+    const query = {};
+    if (categoryFilter && mongoose.Types.ObjectId.isValid(categoryFilter)) {
+      query.category = categoryFilter;
+    }
+    const [internships, studentAgg, categories, unplacedApplicantsCount] = await Promise.all([
+      Internship.find(query).sort({ sortOrder: 1, title: 1 }).populate('category', 'name').lean(),
+      StudentApplication.aggregate([
+        { $match: { internship: { $ne: null } } },
+        { $group: { _id: '$internship', count: { $sum: 1 } } },
+      ]),
+      InternshipCategory.find().sort({ sortOrder: 1, name: 1 }).lean(),
+      StudentApplication.countDocuments({ internship: null }),
+    ]);
+    const studentCountByInternship = Object.fromEntries(
+      studentAgg.map((x) => [String(x._id), x.count])
+    );
+
+    const pickI = (req.query.pick_i || '').trim();
+    const pickQ = (req.query.pick_q || '').trim();
+    const pickPool = (req.query.pick_pool || 'all').trim() === 'unplaced' ? 'unplaced' : 'all';
+    const pickStatus =
+      req.query.pick_status && APPLICATION_STATUSES.includes(String(req.query.pick_status).trim())
+        ? String(req.query.pick_status).trim()
+        : '';
+    const pickPage = Math.max(1, parseInt(req.query.pick_page, 10) || 1);
+    const pickLimit = Math.min(100, Math.max(10, parseInt(req.query.pick_limit, 10) || 25));
+
+    let pickTarget = null;
+    let pickCandidates = [];
+    let pickMeta = {
+      q: pickQ,
+      pool: pickPool,
+      status: pickStatus,
+      page: pickPage,
+      limit: pickLimit,
+      total: 0,
+      totalPages: 1,
+    };
+
+    if (pickI && mongoose.Types.ObjectId.isValid(pickI)) {
+      pickTarget = await Internship.findById(pickI).populate('category', 'name').lean();
+      if (pickTarget) {
+        const pickQuery = buildPickStudentsQuery(pickI, {
+          pickQ,
+          pickPool,
+          pickStatus,
+        });
+        const [total, rows] = await Promise.all([
+          StudentApplication.countDocuments(pickQuery),
+          StudentApplication.find(pickQuery)
+            .sort({ submittedAt: -1 })
+            .skip((pickPage - 1) * pickLimit)
+            .limit(pickLimit)
+            .select('firstname lastname email applicationId status university level internship')
+            .populate('internship', 'title')
+            .lean(),
+        ]);
+        pickCandidates = rows;
+        pickMeta.total = total;
+        pickMeta.totalPages = Math.max(1, Math.ceil(total / pickLimit));
+      }
+    }
+
+    const assignNotice = (req.query.assignNotice || '').trim();
+    const assignListErr = (req.query.assignErr || '').trim();
+    const assignBulk = parseInt(req.query.bulk, 10);
+    const assignSkipped = parseInt(req.query.skipped, 10);
+
+    res.render('admin/internship-list', {
+      title: 'Internships',
+      layout: 'layout-admin',
+      adminPage: 'internships',
+      internships,
+      studentCountByInternship,
+      categories,
+      categoryFilter,
+      applicationStatuses: APPLICATION_STATUSES,
+      pickI: pickTarget ? pickI : '',
+      pickTarget,
+      pickCandidates,
+      pickMeta,
+      assignNotice,
+      assignListErr,
+      assignBulk: Number.isFinite(assignBulk) ? assignBulk : null,
+      assignSkipped: Number.isFinite(assignSkipped) ? assignSkipped : null,
+      unplacedApplicantsCount,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+});
+
+router.get('/internships/new', async (req, res) => {
+  try {
+    const categories = await InternshipCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
+    res.render('admin/internship-edit', {
+      title: 'New internship',
+      layout: 'layout-admin',
+      adminPage: 'internships',
+      internship: null,
+      categories,
+      error: req.query.error === 'nocat' ? 'Create at least one active category before adding an internship.' : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internships');
+  }
+});
+
+router.post('/internships', async (req, res) => {
+  try {
+    const { title, description, category, sortOrder, active } = req.body || {};
+    const titleTrim = (title || '').trim();
+    const catId = (category || '').trim();
+    if (!titleTrim || !catId || !mongoose.Types.ObjectId.isValid(catId)) {
+      return res.redirect('/admin/internships/new');
+    }
+    const cat = await InternshipCategory.findById(catId).select('_id active').lean();
+    if (!cat || cat.active === false) {
+      return res.redirect('/admin/internships/new?error=nocat');
+    }
+    await Internship.create({
+      title: titleTrim,
+      description: (description || '').trim(),
+      category: catId,
+      sortOrder: parseInt(sortOrder, 10) || 0,
+      active: active === 'on' || active === '1',
+    });
+    res.redirect('/admin/internships');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internships/new');
+  }
+});
+
+router.post('/internships/batch-assign-students', async (req, res) => {
+  const b = req.body || {};
+  const internshipId = String(b.internshipId || '').trim();
+  const returnCategory = String(b.returnCategory || '').trim();
+  const ids = parseBodyStudentIds(b).slice(0, 100);
+
+  const listQs = new URLSearchParams();
+  if (returnCategory && mongoose.Types.ObjectId.isValid(returnCategory)) {
+    listQs.set('category', returnCategory);
+  }
+  if (internshipId && mongoose.Types.ObjectId.isValid(internshipId)) {
+    listQs.set('pick_i', internshipId);
+  }
+  const pq = String(b.pick_q || '').trim();
+  const pp = String(b.pick_pool || '').trim();
+  const ps = String(b.pick_status || '').trim();
+  const ppage = String(b.pick_page || '').trim();
+  if (pq) listQs.set('pick_q', pq);
+  if (pp === 'unplaced') listQs.set('pick_pool', 'unplaced');
+  if (ps && APPLICATION_STATUSES.includes(ps)) listQs.set('pick_status', ps);
+  if (ppage && parseInt(ppage, 10) > 1) listQs.set('pick_page', ppage);
+
+  const baseList = '/admin/internships' + (listQs.toString() ? `?${listQs.toString()}` : '');
+  const join = listQs.toString() ? '&' : '?';
+
+  if (!mongoose.Types.ObjectId.isValid(internshipId) || !ids.length) {
+    return res.redirect(
+      303,
+      baseList + join + 'assignErr=' + encodeURIComponent(!ids.length ? 'noselection' : 'invalid')
+    );
+  }
+
+  let ok = 0;
+  let skipped = 0;
+  try {
+    for (const studentId of ids) {
+      const result = await assignStudentToInternship(internshipId, studentId);
+      if (result.ok) ok += 1;
+      else skipped += 1;
+    }
+  } catch (err) {
+    console.error(err);
+    return res.redirect(303, baseList + join + 'assignErr=server');
+  }
+
+  res.redirect(303, baseList + join + `assignNotice=bulk&bulk=${ok}&skipped=${skipped}`);
+});
+
+router.get('/internships/:id', async (req, res) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) return res.redirect('/admin/internships');
+    const internship = await Internship.findById(req.params.id).populate('category', 'name').lean();
+    if (!internship) return res.redirect('/admin/internships');
+
+    const q = (req.query.q || '').trim();
+    const pool = (req.query.pool || 'all').trim() === 'unplaced' ? 'unplaced' : 'all';
+    const statusFilter =
+      req.query.status && APPLICATION_STATUSES.includes(String(req.query.status).trim())
+        ? String(req.query.status).trim()
+        : '';
+    const assignedStatus =
+      req.query.assignedStatus && APPLICATION_STATUSES.includes(String(req.query.assignedStatus).trim())
+        ? String(req.query.assignedStatus).trim()
+        : '';
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = Math.min(100, Math.max(10, parseInt(req.query.limit, 10) || 25));
+
+    const assignedQuery = { internship: internship._id };
+    if (assignedStatus) assignedQuery.status = assignedStatus;
+    const assigned = await StudentApplication.find(assignedQuery)
+      .sort({ lastname: 1, firstname: 1 })
+      .select('firstname lastname email applicationId status university department level')
+      .lean();
+    const assignedObjectIds = assigned.map((a) => a._id);
+
+    const clauses = [];
+    if (assignedObjectIds.length) {
+      clauses.push({ _id: { $nin: assignedObjectIds } });
+    }
+    if (pool === 'unplaced') {
+      clauses.push({ internship: null });
+    }
+    if (statusFilter) {
+      clauses.push({ status: statusFilter });
+    }
+    if (q) {
+      const escaped = String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const re = new RegExp(escaped, 'i');
+      clauses.push({
+        $or: [
+          { firstname: { $regex: re } },
+          { lastname: { $regex: re } },
+          { email: { $regex: re } },
+          { applicationId: { $regex: re } },
+          { university: { $regex: re } },
+          { department: { $regex: re } },
+        ],
+      });
+    }
+    const addQuery = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };
+
+    const [totalCandidates, candidates] = await Promise.all([
+      StudentApplication.countDocuments(addQuery),
+      StudentApplication.find(addQuery)
+        .sort({ submittedAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .select('firstname lastname email applicationId status university department level internship')
+        .populate('internship', 'title')
+        .lean(),
+    ]);
+
+    const studentCount = await StudentApplication.countDocuments({ internship: internship._id });
+    const rosterMeta = {
+      q,
+      pool,
+      status: statusFilter,
+      assignedStatus,
+      page,
+      limit,
+      totalCandidates,
+      totalPages: Math.max(1, Math.ceil(totalCandidates / limit)),
+    };
+
+    const notice = (req.query.notice || '').trim();
+    const assignErr = (req.query.assignErr || '').trim();
+    const bulkCount = parseInt(req.query.bulk, 10);
+    const bulkSkipped = parseInt(req.query.skipped, 10);
+
+    res.render('admin/internship-detail', {
+      title: internship.title,
+      layout: 'layout-admin',
+      adminPage: 'internships',
+      internship,
+      assigned,
+      candidates,
+      rosterMeta,
+      applicationStatuses: APPLICATION_STATUSES,
+      studentCount,
+      notice,
+      assignErr,
+      bulkCount: Number.isFinite(bulkCount) ? bulkCount : null,
+      bulkSkipped: Number.isFinite(bulkSkipped) ? bulkSkipped : null,
+    });
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internships');
+  }
+});
+
+router.post('/internships/:id/assign', async (req, res) => {
+  const internshipId = req.params.id;
+  const studentId = req.body && req.body.studentId ? String(req.body.studentId).trim() : '';
+  const suffix = internshipRosterQuerySuffix(req.body || {});
+  const base = '/admin/internships/' + internshipId + suffix;
+  if (!mongoose.Types.ObjectId.isValid(internshipId) || !mongoose.Types.ObjectId.isValid(studentId)) {
+    return res.redirect(303, base + (suffix.includes('?') ? '&' : '?') + 'assignErr=invalid');
+  }
+  try {
+    const result = await assignStudentToInternship(internshipId, studentId);
+    if (!result.ok) {
+      const errQ = suffix.includes('?') ? '&' : '?';
+      return res.redirect(303, base + errQ + 'assignErr=' + encodeURIComponent(result.code));
+    }
+  } catch (err) {
+    console.error(err);
+    const errQ = suffix.includes('?') ? '&' : '?';
+    return res.redirect(303, base + errQ + 'assignErr=server');
+  }
+  const okQ = suffix.includes('?') ? '&' : '?';
+  res.redirect(303, base + okQ + 'notice=assigned');
+});
+
+router.post('/internships/:id/assign-bulk', async (req, res) => {
+  const internshipId = req.params.id;
+  const suffix = internshipRosterQuerySuffix(req.body || {});
+  const base = '/admin/internships/' + internshipId + suffix;
+  if (!mongoose.Types.ObjectId.isValid(internshipId)) {
+    return res.redirect(303, '/admin/internships');
+  }
+  const ids = parseBodyStudentIds(req.body).slice(0, 100);
+  if (!ids.length) {
+    const errQ = suffix.includes('?') ? '&' : '?';
+    return res.redirect(303, base + errQ + 'assignErr=noselection');
+  }
+  let ok = 0;
+  let skipped = 0;
+  try {
+    for (const studentId of ids) {
+      const result = await assignStudentToInternship(internshipId, studentId);
+      if (result.ok) ok += 1;
+      else skipped += 1;
+    }
+  } catch (err) {
+    console.error(err);
+    const errQ = suffix.includes('?') ? '&' : '?';
+    return res.redirect(303, base + errQ + 'assignErr=server');
+  }
+  const qJoin = suffix.includes('?') ? '&' : '?';
+  res.redirect(303, base + qJoin + 'notice=bulk&bulk=' + ok + '&skipped=' + skipped);
+});
+
+router.post('/internships/:id/unassign', async (req, res) => {
+  const internshipId = req.params.id;
+  const studentId = req.body && req.body.studentId ? String(req.body.studentId).trim() : '';
+  const suffix = internshipRosterQuerySuffix(req.body || {});
+  const base = '/admin/internships/' + internshipId + suffix;
+  if (!mongoose.Types.ObjectId.isValid(internshipId) || !mongoose.Types.ObjectId.isValid(studentId)) {
+    return res.redirect(303, '/admin/internships');
+  }
+  try {
+    const updated = await StudentApplication.findOneAndUpdate(
+      { _id: studentId, internship: internshipId },
+      { $set: { internship: null } },
+      { new: false }
+    );
+    if (!updated) {
+      const errQ = suffix.includes('?') ? '&' : '?';
+      return res.redirect(303, base + errQ + 'assignErr=unassign_mismatch');
+    }
+  } catch (err) {
+    console.error(err);
+    const errQ = suffix.includes('?') ? '&' : '?';
+    return res.redirect(303, base + errQ + 'assignErr=server');
+  }
+  const okQ = suffix.includes('?') ? '&' : '?';
+  res.redirect(303, base + okQ + 'notice=unassigned');
+});
+
+router.get('/internships/:id/edit', async (req, res) => {
+  try {
+    const internship = await Internship.findById(req.params.id).lean();
+    if (!internship) return res.redirect('/admin/internships');
+    const categories = await InternshipCategory.find().sort({ sortOrder: 1, name: 1 }).lean();
+    res.render('admin/internship-edit', {
+      title: 'Edit internship',
+      layout: 'layout-admin',
+      adminPage: 'internships',
+      internship,
+      categories,
+      error: null,
+    });
+  } catch (err) {
+    res.redirect('/admin/internships');
+  }
+});
+
+router.post('/internships/:id', async (req, res) => {
+  try {
+    const doc = await Internship.findById(req.params.id);
+    if (!doc) return res.redirect('/admin/internships');
+    const { title, description, category, sortOrder, active } = req.body || {};
+    const titleTrim = (title || '').trim();
+    const catId = (category || '').trim();
+    if (!titleTrim || !catId || !mongoose.Types.ObjectId.isValid(catId)) {
+      return res.redirect('/admin/internships/' + req.params.id + '/edit');
+    }
+    const cat = await InternshipCategory.findById(catId).select('_id').lean();
+    if (!cat) {
+      return res.redirect('/admin/internships/' + req.params.id + '/edit');
+    }
+    doc.title = titleTrim;
+    doc.description = (description || '').trim();
+    doc.category = catId;
+    doc.sortOrder = parseInt(sortOrder, 10) || 0;
+    doc.active = active === 'on' || active === '1';
+    await doc.save();
+    res.redirect('/admin/internships');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin/internships');
+  }
+});
+
+router.post('/internships/:id/delete', async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.redirect('/admin/internships');
+    await StudentApplication.updateMany({ internship: id }, { $set: { internship: null } });
+    await Internship.findByIdAndDelete(id);
+  } catch (err) {
+    console.error(err);
+  }
+  res.redirect(303, '/admin/internships');
 });
 
 module.exports = router;

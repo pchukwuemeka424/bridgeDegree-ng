@@ -76,6 +76,33 @@
     </section>
 
     <section class="app-detail-card">
+      <h2 class="app-detail-card-title">Internship placement</h2>
+      <p class="app-detail-card-desc">Set their placement here, or use the <a href="/admin/internships#assign-students-panel">Internships</a> page to search and assign in bulk.</p>
+      <% var currentIns = application.internship; %>
+      <% if (currentIns && (currentIns._id || currentIns)) { %>
+      <p class="app-detail-card-desc" style="margin-top: 0;">Currently on: <a href="/admin/internships/<%= currentIns._id || currentIns %>" class="admin-table-id"><%= currentIns.title ? currentIns.title : 'Open placement roster' %></a><% if (currentIns.category && currentIns.category.name) { %> <span style="color:#64748b;">(<%= currentIns.category.name %>)</span><% } %></p>
+      <% } %>
+      <p class="app-detail-card-desc" style="margin-top: 0;"><a href="/admin/internships?pick_q=<%= encodeURIComponent(application.applicationId) %>#assign-students-panel">Find this applicant on the bulk assign tool</a> (search pre-filled with application ID).</p>
+      <%- include('partials/internship-assign-howto') %>
+      <% if (typeof internships !== 'undefined' && internships && internships.length) { %>
+      <form method="post" action="/admin/applications/<%= application._id %>/internship" class="app-detail-notes-form" style="margin-top: 8px;">
+        <div class="admin-form-group" style="margin-bottom: 16px;">
+          <label for="internshipId" style="color: #334155;">Assigned internship</label>
+          <select name="internshipId" id="internshipId" class="admin-select" style="max-width: 100%; width: 100%; display: block;">
+            <option value="">None (unassigned)</option>
+            <% internships.forEach(function(ins) { %>
+            <option value="<%= ins._id %>" <%= currentIns && String(currentIns._id || currentIns) === String(ins._id) ? 'selected' : '' %>><%= ins.title %><% if (ins.category && ins.category.name) { %> — <%= ins.category.name %><% } %><%= ins.active === false ? ' [inactive]' : '' %></option>
+            <% }); %>
+          </select>
+        </div>
+        <button type="submit" class="app-detail-btn app-detail-btn-primary" style="background: #1e293b;">Save placement</button>
+      </form>
+      <% } else { %>
+      <p class="app-detail-card-desc" style="margin-top: 0;">No internships defined yet. <a href="/admin/internships/new">Create one</a>.</p>
+      <% } %>
+    </section>
+
+    <section class="app-detail-card">
       <h2 class="app-detail-card-title">Research & consent</h2>
       <div class="app-detail-table-wrap">
         <table class="app-detail-table">

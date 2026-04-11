@@ -1,0 +1,43 @@
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / <a href="/admin/internships">Internships</a> / <%= internship ? 'Edit' : 'New' %></nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="briefcase"></i> <%= internship ? 'Edit internship' : 'New internship' %></h1>
+</div>
+<div class="admin-actions">
+  <a href="/admin/internships" class="admin-btn admin-btn-secondary">Back to internships</a>
+</div>
+<div class="admin-card">
+  <% if (typeof error !== 'undefined' && error) { %>
+  <p class="admin-error"><%= error %></p>
+  <% } %>
+  <% if (!categories || !categories.length) { %>
+  <p class="admin-empty-state">You need at least one category. <a href="/admin/internship-categories/new">Create a category</a>.</p>
+  <% } else { %>
+  <form method="post" action="<%= internship ? '/admin/internships/' + internship._id : '/admin/internships' %>">
+    <div class="admin-form-group">
+      <label for="title">Title *</label>
+      <input type="text" id="title" name="title" required value="<%= internship ? (internship.title || '') : '' %>" placeholder="e.g. Summer data analyst — Lagos">
+    </div>
+    <div class="admin-form-group">
+      <label for="category">Category *</label>
+      <select id="category" name="category" class="admin-select" required style="max-width: 500px; width: 100%; display: block;">
+        <option value="">— Select —</option>
+        <% categories.forEach(function(c) { %>
+        <option value="<%= c._id %>" <%= internship && String(internship.category) === String(c._id) ? 'selected' : '' %>><%= c.name %><%= c.active === false ? ' (inactive)' : '' %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div class="admin-form-group">
+      <label for="description">Description (optional)</label>
+      <textarea id="description" name="description" rows="4" placeholder="Partner name, duration, expectations…"><%= internship ? (internship.description || '') : '' %></textarea>
+    </div>
+    <div class="admin-form-group">
+      <label for="sortOrder">Display order (lower = first)</label>
+      <input type="number" id="sortOrder" name="sortOrder" value="<%= internship ? (internship.sortOrder ?? 0) : 0 %>" min="0">
+    </div>
+    <div class="admin-form-group">
+      <label><input type="checkbox" name="active" <%= (internship && internship.active !== false) || !internship ? 'checked' : '' %>> Active</label>
+    </div>
+    <button type="submit" class="admin-btn admin-btn-primary"><%= internship ? 'Update' : 'Create' %> internship</button>
+  </form>
+  <% } %>
+</div>

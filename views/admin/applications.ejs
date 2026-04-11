@@ -1,10 +1,11 @@
 <nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Applications</nav>
 <div class="admin-page-header">
   <h1 class="admin-page-title"><i data-lucide="users"></i> Student applications</h1>
-  <p class="admin-page-desc">Review, filter, and manage student applications.</p>
+  <p class="admin-page-desc">Review, filter, and manage applications. Use <strong>Placement</strong> to see who is on an internship, or <strong>Assign</strong> to jump to the bulk tool with search pre-filled.</p>
 </div>
 
 <div class="admin-actions">
+  <a href="/admin/internships#assign-students-panel" class="admin-btn admin-btn-primary"><i data-lucide="briefcase"></i> Internship assignments</a>
   <a href="/admin" class="admin-btn admin-btn-secondary">Back to dashboard</a>
 </div>
 
@@ -37,6 +38,7 @@
         <th>University</th>
         <th>Level</th>
         <th>Status</th>
+        <th>Placement</th>
         <th>Submitted</th>
         <th>Actions</th>
       </tr>
@@ -60,9 +62,18 @@
             </select>
           </form>
         </td>
+        <td>
+          <% if (a.internship && a.internship.title) { %>
+          <a href="/admin/internships/<%= a.internship._id %>" class="admin-table-id" title="Open roster"><%= a.internship.title.length > 28 ? a.internship.title.slice(0, 28) + '…' : a.internship.title %></a>
+          <% if (a.internship.active === false) { %><span class="admin-badge admin-badge-draft" style="margin-left:4px;">Inactive</span><% } %>
+          <% } else { %>
+          <span style="color:#94a3b8;">—</span>
+          <% } %>
+        </td>
         <td><%= a.submittedAt ? new Date(a.submittedAt).toLocaleDateString() : '' %></td>
         <td class="admin-table-actions-cell">
           <a href="/admin/applications/<%= a._id %>" class="admin-btn admin-btn-secondary">Details</a>
+          <a href="/admin/internships?pick_q=<%= encodeURIComponent(a.applicationId) %>#assign-students-panel" class="admin-btn admin-btn-secondary" title="Choose a placement, then assign">Assign</a>
           <a href="/student/dashboard?email=<%= encodeURIComponent(a.email) %>&applicationId=<%= encodeURIComponent(a.applicationId) %>" target="_blank" class="admin-btn admin-btn-secondary">Student view</a>
         </td>
       </tr>

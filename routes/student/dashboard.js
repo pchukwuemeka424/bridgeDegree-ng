@@ -1,11 +1,45 @@
 'use strict';
 
 const express = require('express');
+const mongoose = require('mongoose');
 const { put: putBlob } = require('@vercel/blob');
 const router = express.Router();
 const StudentApplication = require('../../models/StudentApplication');
+const Internship = require('../../models/Internship');
 const { uploadPassport } = require('../../middleware/upload');
 const { normEmail, normId } = require('./helpers');
+
+/** Students who may self-select an open internship placement from the dashboard. */
+const PLACEMENT_ELIGIBLE_STATUSES = ['accepted', 'shortlisted'];
+
+function groupPlacementsByCategory(placements) {
+  const map = new Map();
+  for (const p of placements) {
+    const cat = p.category;
+    if (!cat || !cat._id) continue;
+    const key = String(cat._id);
+    if (!map.has(key)) {
+      map.set(key, {
+        categoryName: cat.name || 'Other',
+        categorySort: typeof cat.sortOrder === 'number' ? cat.sortOrder : 9999,
+        placements: [],
+      });
+    }
+    map.get(key).placements.push(p);
+  }
+  return Array.from(map.values()).sort((a, b) => {
+    if (a.categorySort !== b.categorySort) return a.categorySort - b.categorySort;
+    return a.categoryName.localeCompare(b.categoryName);
+  });
+}
+
+function dashboardRedirect(path, email, applicationId, query = {}) {
+  const params = new URLSearchParams({ email, applicationId });
+  Object.entries(query).forEach(([k, v]) => {
+    if (v != null && v !== '') params.set(k, v);
+  });
+  return '/student/dashboard' + path + '?' + params.toString();
+}
 
 async function getPassportPhotoUrl(file) {
   if (!file) return null;
@@ -26,7 +60,13 @@ router.get('/dashboard', async (req, res) => {
     return res.redirect('/student/login' + (req.query.redirect ? '?redirect=' + encodeURIComponent(req.query.redirect) : ''));
   }
 
-  const doc = await StudentApplication.findOne({ email, applicationId }).lean();
+  const doc = await StudentApplication.findOne({ email, applicationId })
+    .populate({
+      path: 'internship',
+      select: 'title description active category',
+      populate: { path: 'category', select: 'name' },
+    })
+    .lean();
   if (!doc) {
     return res.redirect('/student/login?error=view');
   }
@@ -35,21 +75,91 @@ router.get('/dashboard', async (req, res) => {
   const withPass = await StudentApplication.findById(doc._id).select('password').lean();
   const hasPassword = !!(withPass && withPass.password);
 
+  const canChoosePlacement = PLACEMENT_ELIGIBLE_STATUSES.includes(application.status);
+  let availablePlacements = [];
+  let placementGroups = [];
+  if (canChoosePlacement) {
+    availablePlacements = await Internship.find({ active: true })
+      .sort({ sortOrder: 1, title: 1 })
+      .populate({
+        path: 'category',
+        select: 'name sortOrder active',
+        match: { active: { $ne: false } },
+      })
+      .lean();
+    availablePlacements = availablePlacements.filter((p) => p.category && p.category._id);
+    placementGroups = groupPlacementsByCategory(availablePlacements);
+  }
+
+  const placementOk = !!req.query.placementOk;
+  const placementErr = (req.query.placementErr || '').trim();
+
   res.render('student/dashboard', {
     title: 'Dashboard',
     layout: 'layout-student',
     application,
     hasPassword,
+    canChoosePlacement,
+    availablePlacements,
+    placementGroups,
+    placementOk,
+    placementErr,
     breadcrumb: ['DASHBOARD'],
     studentNav: { dashboard: true, learning: false, account: false, password: false },
   });
 });
 
-function dashboardRedirect(path, email, applicationId, query = {}) {
-  const params = new URLSearchParams({ email, applicationId });
-  Object.entries(query).forEach(([k, v]) => { if (v != null && v !== '') params.set(k, v); });
-  return '/student/dashboard' + path + '?' + params.toString();
-}
+router.post('/dashboard/placement', async (req, res) => {
+  const email = normEmail(req.body.email);
+  const applicationId = normId(req.body.applicationId);
+  const rawId = req.body.internshipId != null ? String(req.body.internshipId).trim() : '';
+
+  if (!email || !applicationId) {
+    return res.redirect('/student/login');
+  }
+
+  const doc = await StudentApplication.findOne({ email, applicationId });
+  if (!doc) {
+    return res.redirect('/student/login?error=view');
+  }
+
+  const base = dashboardRedirect('', email, applicationId, {});
+
+  if (!PLACEMENT_ELIGIBLE_STATUSES.includes(doc.status)) {
+    return res.redirect(303, base + '&placementErr=eligible');
+  }
+
+  if (!rawId) {
+    return res.redirect(303, base + '&placementErr=missing');
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(rawId)) {
+    return res.redirect(303, base + '&placementErr=invalid');
+  }
+
+  const placement = await Internship.findById(rawId)
+    .select('_id active category')
+    .populate({ path: 'category', select: 'active' })
+    .lean();
+  if (!placement) {
+    return res.redirect(303, base + '&placementErr=notfound');
+  }
+  if (!placement.active) {
+    return res.redirect(303, base + '&placementErr=inactive');
+  }
+  if (!placement.category || placement.category.active === false) {
+    return res.redirect(303, base + '&placementErr=inactive');
+  }
+
+  try {
+    doc.internship = placement._id;
+    await doc.save();
+    return res.redirect(303, base + '&placementOk=1');
+  } catch (err) {
+    console.error(err);
+    return res.redirect(303, base + '&placementErr=server');
+  }
+});
 
 router.get('/dashboard/account', async (req, res) => {
   const email = normEmail(req.query.email);

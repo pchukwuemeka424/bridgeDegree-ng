@@ -253,12 +253,81 @@ async function sendEmail(opts) {
   }
 }
 
+/**
+ * Notify a student they have been assigned to an internship placement (admin or roster tools).
+ * @param {Object} application - { email, firstname, applicationId }
+ * @param {Object} placement - { title, category?: { name } }
+ * @returns {Promise<{ success: boolean, error?: string }>}
+ */
+async function sendPlacementAssignedEmail(application, placement) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not set; skipping placement assigned email.');
+    return { success: false, error: 'RESEND_API_KEY not set' };
+  }
+
+  const to = application.email;
+  if (!to) {
+    return { success: false, error: 'No recipient email' };
+  }
+
+  const firstName = application.firstname || 'there';
+  const applicationId = application.applicationId || '';
+  const placementTitle = (placement && placement.title) || 'your new placement';
+  const categoryLine =
+    placement && placement.category && placement.category.name
+      ? `<p><strong>Category:</strong> ${escapeHtml(placement.category.name)}</p>`
+      : '';
+
+  const dashboardUrl = `${BASE_URL}/student/dashboard?email=${encodeURIComponent(to)}&applicationId=${encodeURIComponent(applicationId)}`;
+
+  const subject = `Bridge Degree – Placement assigned: ${placementTitle}`;
+  const preheader = `You have been assigned to ${placementTitle}. View details on your dashboard.`;
+  const title = 'You have a placement';
+  const bodyHtml = `
+    <p>Hi ${escapeHtml(firstName)},</p>
+    <p>You have been assigned to the following internship placement:</p>
+    <p style="margin: 16px 0; padding: 14px 18px; background: #f8fafc; border-radius: 8px; border-left: 4px solid #1e3a5f;">
+      <strong style="font-size: 17px; color: #1e3a5f;">${escapeHtml(placementTitle)}</strong>
+    </p>
+    ${categoryLine}
+    <p><strong>Application ID:</strong> ${escapeHtml(applicationId)}</p>
+    <p>Open your student dashboard to review your placement and next steps.</p>
+  `;
+
+  const html = buildEmailHtml({
+    subject,
+    preheader,
+    title,
+    bodyHtml,
+    ctaText: 'Open my dashboard',
+    ctaUrl: dashboardUrl,
+  });
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM,
+      to: [to],
+      subject,
+      html,
+    });
+    if (error) {
+      console.error('Resend error (placement assigned):', error);
+      return { success: false, error: error.message };
+    }
+    return { success: true, id: data?.id };
+  } catch (err) {
+    console.error('Placement assigned email failed:', err);
+    return { success: false, error: err.message };
+  }
+}
+
 module.exports = {
   resend,
   buildEmailHtml,
   sendEmail,
   sendApplicationStatusEmail,
   sendWelcomeEmail,
+  sendPlacementAssignedEmail,
   STATUS_LABELS,
   STATUS_MESSAGES,
 };

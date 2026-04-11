@@ -1,0 +1,232 @@
+<% 
+  var cf = typeof categoryFilter !== 'undefined' ? categoryFilter : '';
+  var pm = typeof pickMeta !== 'undefined' && pickMeta ? pickMeta : {};
+  var pti = typeof pickI !== 'undefined' ? pickI : '';
+  var ptarget = typeof pickTarget !== 'undefined' ? pickTarget : null;
+  var enc = function(obj) {
+    var p = new URLSearchParams();
+    if (obj.category) p.set('category', obj.category);
+    if (obj.pick_i) p.set('pick_i', obj.pick_i);
+    if (obj.pick_q) p.set('pick_q', obj.pick_q);
+    if (obj.pick_pool === 'unplaced') p.set('pick_pool', 'unplaced');
+    if (obj.pick_status) p.set('pick_status', obj.pick_status);
+    if (obj.pick_page && obj.pick_page > 1) p.set('pick_page', String(obj.pick_page));
+    var s = p.toString();
+    return s ? ('?' + s) : '';
+  };
+  var navPick = { pick_q: pm.q || '', pick_i: pti, pick_pool: pm.pool || 'all', pick_status: pm.status || '', pick_page: pm.page || 1 };
+%>
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Internships</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="briefcase"></i> Internships</h1>
+  <p class="admin-page-desc">Create placements, see headcount, assign students from this page, or open a placement to manage its roster.</p>
+</div>
+
+<% if (typeof assignNotice !== 'undefined' && assignNotice === 'bulk') { %>
+<div class="admin-card" style="padding:14px 20px; margin-bottom:16px; border-color:#86efac; background:#f0fdf4;">
+  <strong>Assigned</strong> — <%= typeof assignBulk === 'number' ? assignBulk : 0 %> student(s) added to the selected placement<% if (typeof assignSkipped === 'number' && assignSkipped > 0) { %>; <%= assignSkipped %> skipped (inactive placement, already assigned, or not found)<% } %>.
+</div>
+<% } %>
+<% if (typeof assignListErr !== 'undefined' && assignListErr) { %>
+<div class="admin-card" style="padding:14px 20px; margin-bottom:16px; border-color:#fecaca; background:#fef2f2; color:#991b1b;">
+  <% if (assignListErr === 'noselection') { %><strong>No students selected</strong> — tick one or more rows, then click Assign selected students.<% } %>
+  <% if (assignListErr === 'invalid') { %><strong>Invalid placement or request.</strong><% } %>
+  <% if (assignListErr === 'server') { %><strong>Something went wrong.</strong> Try again.<% } %>
+  <% if (!['noselection','invalid','server'].includes(assignListErr)) { %>Error: <%= assignListErr %><% } %>
+</div>
+<% } %>
+
+<div class="admin-actions">
+  <a href="/admin/internships/new" class="admin-btn admin-btn-primary"><i data-lucide="plus"></i> New internship</a>
+  <a href="/admin/internship-categories" class="admin-btn admin-btn-secondary">Manage categories</a>
+  <a href="/admin" class="admin-btn admin-btn-secondary">Dashboard</a>
+</div>
+
+<div class="admin-card" id="assign-students-panel">
+  <h2 class="admin-card__title"><i data-lucide="user-plus" style="width:18px;height:18px;vertical-align:-3px;"></i> Select students &amp; assign to a placement</h2>
+  <% if (typeof unplacedApplicantsCount === 'number') { %>
+  <p class="admin-table-summary" style="margin-top:0;"><strong><%= unplacedApplicantsCount %></strong> applicant<%= unplacedApplicantsCount === 1 ? '' : 's' %> with no placement yet — use <em>Unplaced only</em> after you choose a placement.</p>
+  <% } %>
+  <p class="admin-table-summary">1) Choose a placement. 2) Search or filter. 3) Tick rows and <em>Assign selected students</em>. Students on another placement are <strong>moved</strong> here automatically.</p>
+  <%- include('partials/internship-assign-howto') %>
+
+  <% if (pm.q && !ptarget) { %>
+  <div class="admin-callout">
+    <strong>Search is ready.</strong> Choose a placement below — the list will load applicants matching <code style="background:#fef3c7;padding:2px 6px;border-radius:4px;"><%= pm.q %></code> (you can change the search and click Apply again).
+  </div>
+  <% } %>
+
+  <form method="get" action="/admin/internships" class="admin-applications-search" style="margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end;">
+    <% if (cf) { %><input type="hidden" name="category" value="<%= cf %>"><% } %>
+    <div class="admin-form-group" style="margin-bottom:0; min-width: 200px; flex: 1;">
+      <label for="pick_q" style="display:block; font-weight:600; margin-bottom:6px; color:#334155; font-size:0.9rem;">Search applicants</label>
+      <input type="search" name="pick_q" id="pick_q" class="admin-input" placeholder="Name, email, application ID, university…" value="<%= pm.q || '' %>" autocomplete="off">
+    </div>
+    <div class="admin-form-group" style="margin-bottom:0; min-width: 280px; flex: 1;">
+      <label for="pick_i" style="display:block; font-weight:600; margin-bottom:6px; color:#334155; font-size:0.9rem;">Placement</label>
+      <select name="pick_i" id="pick_i" class="admin-select" style="width:100%; max-width:420px;" onchange="this.form.submit()">
+        <option value="">— Choose internship —</option>
+        <% if (internships && internships.length) { internships.forEach(function(i) { %>
+        <option value="<%= i._id %>" <%= String(pti) === String(i._id) ? 'selected' : '' %>><%= i.title %><%= i.active === false ? ' [inactive]' : '' %><%= i.category && i.category.name ? ' · ' + i.category.name : '' %></option>
+        <% }); } %>
+      </select>
+    </div>
+    <button type="submit" class="admin-btn admin-btn-secondary">Apply search</button>
+  </form>
+
+  <% if (pti && ptarget) { %>
+  <div class="admin-applications-toolbar" style="margin-bottom:12px;">
+    <div class="admin-applications-filters" style="margin-bottom:10px;">
+      <span class="admin-filters-label">Pool:</span>
+      <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_pool: 'all', pick_page: 1 })) %>" class="admin-filter-pill<%= pm.pool !== 'unplaced' ? ' admin-filter-pill--active' : '' %>">All eligible</a>
+      <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_pool: 'unplaced', pick_page: 1 })) %>" class="admin-filter-pill<%= pm.pool === 'unplaced' ? ' admin-filter-pill--active' : '' %>">Unplaced only</a>
+    </div>
+    <div class="admin-applications-filters">
+      <span class="admin-filters-label">Status:</span>
+      <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_status: '', pick_page: 1 })) %>" class="admin-filter-pill<%= !pm.status ? ' admin-filter-pill--active' : '' %>">Any</a>
+      <% if (typeof applicationStatuses !== 'undefined' && applicationStatuses) { applicationStatuses.forEach(function(st) { %>
+      <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_status: st, pick_page: 1 })) %>" class="admin-filter-pill<%= pm.status === st ? ' admin-filter-pill--active' : '' %>"><%= st.replace('_', ' ') %></a>
+      <% }); } %>
+    </div>
+  </div>
+
+  <% var tp = pm.totalPages || 1; var cp = pm.page || 1; var fromN = pm.total ? ((cp - 1) * (pm.limit || 25) + 1) : 0; var toN = Math.min(cp * (pm.limit || 25), pm.total || 0); %>
+  <% if (pm.total > 0) { %>
+  <p class="admin-table-summary">Showing <%= fromN %>–<%= toN %> of <strong><%= pm.total %></strong> applicants for <strong><%= ptarget.title %></strong>.</p>
+  <div class="admin-actions" style="margin-bottom:12px;">
+    <% if (cp > 1) { %>
+    <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_page: cp - 1 })) %>" class="admin-btn admin-btn-secondary">Previous</a>
+    <% } %>
+    <% if (cp < tp) { %>
+    <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: cf, pick_page: cp + 1 })) %>" class="admin-btn admin-btn-secondary">Next</a>
+    <% } %>
+    <span style="font-size:0.9rem;color:#64748b;align-self:center;">Page <%= cp %> / <%= tp %></span>
+  </div>
+  <% } %>
+
+  <% if (typeof pickCandidates !== 'undefined' && pickCandidates && pickCandidates.length) { %>
+  <form method="post" action="/admin/internships/batch-assign-students" id="internship-list-batch-form">
+    <input type="hidden" name="internshipId" value="<%= pti %>">
+    <% if (cf) { %><input type="hidden" name="returnCategory" value="<%= cf %>"><% } %>
+    <input type="hidden" name="pick_q" value="<%= pm.q || '' %>">
+    <input type="hidden" name="pick_pool" value="<%= pm.pool || 'all' %>">
+    <input type="hidden" name="pick_status" value="<%= pm.status || '' %>">
+    <input type="hidden" name="pick_page" value="<%= cp %>">
+    <div class="admin-actions" style="margin-bottom:12px;">
+      <button type="submit" class="admin-btn admin-btn-primary" <%= ptarget.active ? '' : 'disabled title="Activate this placement first"' %>><i data-lucide="user-check"></i> Assign selected students</button>
+      <button type="button" class="admin-btn admin-btn-secondary" id="list-pick-select-all">Select all on page</button>
+      <button type="button" class="admin-btn admin-btn-secondary" id="list-pick-select-none">Clear selection</button>
+      <a href="/admin/internships/<%= pti %>" class="admin-btn admin-btn-secondary">Open placement roster</a>
+    </div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px;"><span class="admin-sr-only">Select</span></th>
+          <th>Name</th>
+          <th>Application ID</th>
+          <th>University</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Current placement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% pickCandidates.forEach(function(s) { %>
+        <tr>
+          <td>
+            <input type="checkbox" name="studentIds" value="<%= s._id %>" class="list-pick-cb" <%= ptarget.active ? '' : 'disabled' %>>
+          </td>
+          <td><a href="/admin/applications/<%= s._id %>" class="admin-table-id"><%= s.firstname %> <%= s.lastname %></a></td>
+          <td><code style="font-size:0.85em;"><%= s.applicationId %></code></td>
+          <td><%= s.university || '—' %></td>
+          <td><%= s.email %></td>
+          <td><span class="admin-badge admin-badge-<%= s.status %>"><%= s.status.replace('_', ' ') %></span></td>
+          <td><%= s.internship && s.internship.title ? s.internship.title : (s.internship ? 'Other' : '—') %></td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </form>
+  <script>
+  (function () {
+    var allBtn = document.getElementById('list-pick-select-all');
+    var noneBtn = document.getElementById('list-pick-select-none');
+    var bulkForm = document.getElementById('internship-list-batch-form');
+    var boxes = function () { return document.querySelectorAll('.list-pick-cb'); };
+    if (allBtn) allBtn.addEventListener('click', function () {
+      boxes().forEach(function (cb) { if (!cb.disabled) cb.checked = true; });
+    });
+    if (noneBtn) noneBtn.addEventListener('click', function () {
+      boxes().forEach(function (cb) { cb.checked = false; });
+    });
+    if (bulkForm) {
+      var title = <%- JSON.stringify(ptarget && ptarget.title ? ptarget.title : 'this placement') %>;
+      bulkForm.addEventListener('submit', function (e) {
+        var n = document.querySelectorAll('#internship-list-batch-form .list-pick-cb:checked').length;
+        if (n === 0) return;
+        if (!confirm('Assign ' + n + ' student(s) to “' + title + '”?')) e.preventDefault();
+      });
+    }
+  })();
+  </script>
+  <% } else if (ptarget) { %>
+  <p class="admin-empty-state">No applicants match these filters (or everyone is already on this placement). Try another search or pool.</p>
+  <% } %>
+  <% } else { %>
+  <p class="admin-table-summary" style="margin-bottom:0;"><% if (pm.q) { %>Choose a <strong>placement</strong> above to load applicants.<% } else { %>Choose a <strong>placement</strong> to load students you can assign (search is optional).<% } %></p>
+  <% } %>
+</div>
+
+<style>.admin-sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }</style>
+
+<% if (categories && categories.length) { %>
+<div class="admin-applications-toolbar">
+  <div class="admin-applications-filters">
+    <span class="admin-filters-label">Category:</span>
+    <a href="/admin/internships<%= enc(Object.assign({}, navPick, { pick_page: 1 })) %>" class="admin-filter-pill<%= !cf ? ' admin-filter-pill--active' : '' %>">All</a>
+    <% categories.forEach(function(cat) { %>
+    <a href="/admin/internships<%= enc(Object.assign({}, navPick, { category: String(cat._id), pick_page: 1 })) %>" class="admin-filter-pill<%= cf === String(cat._id) ? ' admin-filter-pill--active' : '' %>"><%= cat.name %></a>
+    <% }); %>
+  </div>
+</div>
+<% } %>
+
+<div class="admin-card">
+  <h2 class="admin-card__title">All placements</h2>
+  <% if (internships && internships.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Students</th>
+        <th>Active</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% internships.forEach(function(i) { %>
+      <% var sc = typeof studentCountByInternship !== 'undefined' && studentCountByInternship[String(i._id)] != null ? studentCountByInternship[String(i._id)] : 0; %>
+      <tr>
+        <td>
+          <a href="/admin/internships/<%= i._id %>" class="admin-table-id"><%= i.title %></a>
+        </td>
+        <td><%= i.category && i.category.name ? i.category.name : '—' %></td>
+        <td><strong><%= sc %></strong></td>
+        <td><span class="admin-badge <%= i.active ? 'admin-badge-published' : 'admin-badge-draft' %>"><%= i.active ? 'Yes' : 'No' %></span></td>
+        <td class="actions">
+          <a href="/admin/internships<%= enc(Object.assign({}, navPick, { pick_i: String(i._id), category: cf, pick_page: 1 })) %>" class="admin-btn admin-btn-secondary">Select students</a>
+          <a href="/admin/internships/<%= i._id %>" class="admin-btn admin-btn-secondary">Students</a>
+          <a href="/admin/internships/<%= i._id %>/edit" class="admin-btn admin-btn-secondary">Edit</a>
+          <form method="post" action="/admin/internships/<%= i._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this internship? Assigned students will be unassigned.');">
+            <button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p class="admin-empty-state">No internships yet. Add <a href="/admin/internship-categories">categories</a> first, then <a href="/admin/internships/new">create an internship</a>.</p>
+  <% } %>
+</div>

@@ -52,6 +52,14 @@
           <i data-lucide="users" class="admin-sidebar__icon"></i>
           <span>Applications</span>
         </a>
+        <a href="/admin/internship-categories" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'internship_categories' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="folder-tree" class="admin-sidebar__icon"></i>
+          <span>Internship categories</span>
+        </a>
+        <a href="/admin/internships#assign-students-panel" class="admin-sidebar__link<%= typeof adminPage !== 'undefined' && adminPage === 'internships' ? ' admin-sidebar__link--active' : '' %>">
+          <i data-lucide="briefcase" class="admin-sidebar__icon"></i>
+          <span>Internships</span>
+        </a>
         <div class="admin-sidebar__divider"></div>
         <a href="/" target="_blank" class="admin-sidebar__link">
           <i data-lucide="external-link" class="admin-sidebar__icon"></i>

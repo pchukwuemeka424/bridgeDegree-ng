@@ -35,12 +35,18 @@ const studentApplicationSchema = new mongoose.Schema({
   },
   adminNotes: { type: String, default: '' },
   passportPhoto: { type: String, default: '' },
+  internship: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Internship',
+    default: null,
+  },
   submittedAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 studentApplicationSchema.index({ email: 1 });
 studentApplicationSchema.index({ submittedAt: -1 });
+studentApplicationSchema.index({ internship: 1 });
 
 studentApplicationSchema.pre('save', function () {
   this.updatedAt = new Date();

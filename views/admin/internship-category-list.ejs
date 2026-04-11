@@ -1,0 +1,52 @@
+<nav class="admin-breadcrumb">/ <a href="/admin">Dashboard</a> / Internship categories</nav>
+<div class="admin-page-header">
+  <h1 class="admin-page-title"><i data-lucide="folder-tree"></i> Internship categories</h1>
+  <p class="admin-page-desc">Group internships (e.g. Engineering, Business, Remote) and see how many internships use each category.</p>
+</div>
+
+<% if (typeof listError !== 'undefined' && listError) { %>
+<p class="admin-error" style="margin-bottom: 16px;"><%= listError %></p>
+<% } %>
+
+<div class="admin-actions">
+  <a href="/admin/internship-categories/new" class="admin-btn admin-btn-primary"><i data-lucide="plus"></i> New category</a>
+  <a href="/admin/internships" class="admin-btn admin-btn-secondary">Internships</a>
+  <a href="/admin" class="admin-btn admin-btn-secondary">Dashboard</a>
+</div>
+
+<div class="admin-card">
+  <% if (categories && categories.length) { %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Order</th>
+        <th>Active</th>
+        <th>Internships</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% categories.forEach(function(c) { %>
+      <% var ic = typeof countByCategory !== 'undefined' && countByCategory[String(c._id)] != null ? countByCategory[String(c._id)] : 0; %>
+      <tr>
+        <td><strong><%= c.name %></strong></td>
+        <td><%= c.description ? (c.description.length > 60 ? c.description.slice(0, 60) + '…' : c.description) : '—' %></td>
+        <td><%= c.sortOrder %></td>
+        <td><span class="admin-badge <%= c.active ? 'admin-badge-published' : 'admin-badge-draft' %>"><%= c.active ? 'Yes' : 'No' %></span></td>
+        <td><strong><%= ic %></strong></td>
+        <td class="actions">
+          <a href="/admin/internship-categories/<%= c._id %>/edit" class="admin-btn admin-btn-secondary">Edit</a>
+          <form method="post" action="/admin/internship-categories/<%= c._id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this category? You cannot delete it if internships still use it.');">
+            <button type="submit" class="admin-btn admin-btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <% }); %>
+    </tbody>
+  </table>
+  <% } else { %>
+  <p class="admin-empty-state">No categories yet. <a href="/admin/internship-categories/new">Create a category</a> before adding internships.</p>
+  <% } %>
+</div>

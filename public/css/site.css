@@ -47,7 +47,19 @@ body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--te
 .header-top-left a, .header-top-right a { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.95); text-decoration: none; font-size: 0.875rem; font-weight: 500; }
 .header-top-left a:hover, .header-top-right a:hover { color: #fff; }
 .header-top-left .lucide, .header-top-right .lucide { width: 16px; height: 16px; }
-.header-top-right { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.header-top-right { display: flex; align-items: center; gap: 16px 20px; flex-wrap: wrap; }
+.header-top-social .social-icons { gap: 12px; align-items: center; }
+.header-top-social .social-icons a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.92);
+  opacity: 1;
+  transition: color 0.2s, transform 0.2s;
+}
+.header-top-social .social-icons a:hover { color: #fff; transform: scale(1.08); }
+.header-top-social .social-icons .lucide,
+.header-top-social .social-icons a svg { width: 17px; height: 17px; }
 .btn-support { display: inline-flex; background: var(--accent-green); color: var(--surface); padding: 8px 18px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.875rem; }
 .btn-support:hover { opacity: 0.9; }
 header { position: sticky; top: 0; z-index: 100; background: var(--surface); border-bottom: 1px solid var(--border); }
@@ -113,7 +125,8 @@ header { position: sticky; top: 0; z-index: 100; background: var(--surface); bor
 .footer-social .social-icons { display: flex; gap: 14px; align-items: center; }
 .footer-social .social-icons a { color: rgba(255,255,255,0.85); transition: color 0.2s, transform 0.2s; }
 .footer-social .social-icons a:hover { color: var(--accent-orange); transform: scale(1.08); }
-.footer-social .social-icons .lucide { width: 22px; height: 22px; }
+.footer-social .social-icons .lucide,
+.footer-social .social-icons a svg { width: 22px; height: 22px; display: block; flex-shrink: 0; }
 .legal-footer { background: #0f2847; padding: 18px 32px; font-size: 0.8rem; color: rgba(255,255,255,0.55); }
 .legal-footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
 .legal-nav { display: flex; align-items: center; gap: 24px; }
@@ -123,7 +136,8 @@ header { position: sticky; top: 0; z-index: 100; background: var(--surface); bor
 .social-icons { display: flex; gap: 16px; align-items: center; }
 .social-icons a { color: var(--surface); opacity: 0.9; transition: opacity 0.2s; }
 .social-icons a:hover { opacity: 1; }
-.social-icons .lucide { width: 22px; height: 22px; }
+.social-icons .lucide,
+.social-icons a svg { width: 22px; height: 22px; display: block; flex-shrink: 0; }
 
 /* Form */
 .form-group { margin-bottom: 20px; }

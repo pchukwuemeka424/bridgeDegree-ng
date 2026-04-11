@@ -492,3 +492,67 @@
   font-style: normal;
   color: #94a3b8;
 }
+
+/* Collapsible admin help (e.g. internship assignment) */
+.admin-howto {
+  margin-top: 16px;
+  margin-bottom: 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 0;
+}
+.admin-howto__summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #334155;
+  padding: 12px 16px;
+  list-style: none;
+}
+.admin-howto__summary::-webkit-details-marker { display: none; }
+.admin-howto__summary::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 5px solid #64748b;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  margin-right: 10px;
+  vertical-align: middle;
+  transition: transform 0.15s;
+}
+.admin-howto[open] .admin-howto__summary::before {
+  transform: rotate(90deg);
+}
+.admin-howto__body {
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.55;
+}
+.admin-howto__lead { margin: 12px 0 8px 0; }
+.admin-howto__list { margin: 0 0 12px 1.1em; padding: 0; }
+.admin-howto__list li { margin-bottom: 8px; }
+.admin-howto__note {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+.admin-callout {
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+.admin-callout strong { color: #78350f; }
+

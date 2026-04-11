@@ -1,5 +1,6 @@
 /**
- * Seed database with admin, blog posts, and sample student applications.
+ * Seed database with admin, blog posts, sample student applications,
+ * and default internship categories (admin → Internship categories).
  * Run: npm run seed  or  node scripts/seed.js
  */
 const path = require('path');
@@ -10,6 +11,8 @@ const BlogPost = require('../models/BlogPost');
 const StudentApplication = require('../models/StudentApplication');
 const Testimonial = require('../models/Testimonial');
 const Partner = require('../models/Partner');
+const InternshipCategory = require('../models/InternshipCategory');
+const Internship = require('../models/Internship');
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/bridgedegree';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@bridgedegree.com';
@@ -145,6 +148,40 @@ const samplePartners = [
   { name: 'Partner 3', logo: '/images/p-3.png', link: '', order: 2, active: true },
 ];
 
+/** Default admin internship categories (aligned with student application “work experience” options). */
+const defaultInternshipCategories = [
+  {
+    name: 'Remote internships',
+    description: 'Virtual placements with vetted partners; performance-tracked and mentor-validated.',
+    sortOrder: 10,
+  },
+  {
+    name: 'Local company internships',
+    description: 'In-person or hybrid roles with Nigerian employers and corporates.',
+    sortOrder: 20,
+  },
+  {
+    name: 'International remote projects',
+    description: 'Cross-border remote briefs and global team experience.',
+    sortOrder: 30,
+  },
+  {
+    name: 'Research & academic publishing',
+    description: 'Research assistantships and publication pipeline placements.',
+    sortOrder: 40,
+  },
+  {
+    name: 'Startup building',
+    description: 'Startup incubation, product sprints, and founder-track experience.',
+    sortOrder: 50,
+  },
+  {
+    name: 'NGO / social impact work',
+    description: 'Non-profit and social-impact programmes with documented outcomes.',
+    sortOrder: 60,
+  },
+];
+
 async function seed() {
   await mongoose.connect(MONGODB_URI);
   console.log('Connected to MongoDB\n');
@@ -204,6 +241,53 @@ async function seed() {
     }
   } else {
     console.log('Partners already exist (' + existingPartners + '), skipping.');
+  }
+
+  // Internship categories (admin: /admin/internship-categories) — add any missing defaults by name
+  let categoriesCreated = 0;
+  for (const c of defaultInternshipCategories) {
+    const exists = await InternshipCategory.findOne({ name: c.name });
+    if (!exists) {
+      await InternshipCategory.create({
+        name: c.name,
+        description: c.description,
+        sortOrder: c.sortOrder,
+        active: true,
+      });
+      categoriesCreated += 1;
+      console.log('Created internship category:', c.name);
+    }
+  }
+  if (categoriesCreated === 0) {
+    const n = await InternshipCategory.countDocuments();
+    console.log('Internship categories: all defaults present (' + n + ' total in DB).');
+  }
+
+  // Sample internships (student dashboard lists these; categories alone are not placements)
+  const internshipCount = await Internship.countDocuments();
+  if (internshipCount === 0) {
+    const cats = await InternshipCategory.find({ active: { $ne: false } }).sort({ sortOrder: 1, name: 1 }).lean();
+    if (cats.length) {
+      let order = 10;
+      for (const c of cats) {
+        await Internship.create({
+          title: 'Sample placement — ' + c.name,
+          description:
+            'Example open placement in the “' +
+            c.name +
+            '” category. Replace or edit in Admin → Internships.',
+          category: c._id,
+          sortOrder: order,
+          active: true,
+        });
+        order += 10;
+      }
+      console.log('Created sample internships: ' + cats.length + ' (one per active category).');
+    } else {
+      console.log('Skipping sample internships: no active internship categories yet.');
+    }
+  } else {
+    console.log('Internships already exist (' + internshipCount + '), skipping sample placements.');
   }
 
   console.log('\nSeed complete.');
