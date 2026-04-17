@@ -263,7 +263,7 @@ async function seed() {
     console.log('Internship categories: all defaults present (' + n + ' total in DB).');
   }
 
-  // Sample internships (student dashboard lists these; categories alone are not placements)
+  // Sample internships (admin assigns students to these; categories alone are not placements)
   const internshipCount = await Internship.countDocuments();
   if (internshipCount === 0) {
     const cats = await InternshipCategory.find({ active: { $ne: false } }).sort({ sortOrder: 1, name: 1 }).lean();

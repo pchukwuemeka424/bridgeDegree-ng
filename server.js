@@ -7,6 +7,14 @@ const cookieParser = require('cookie-parser');
 const expressLayouts = require('express-ejs-layouts');
 const { connectDB } = require('./config/db');
 const { stripHtml, renderBlogContent } = require('./utils/html');
+const {
+  toAbsoluteUrl,
+  canonicalUrl: seoCanonicalUrl,
+  MARKETING_PATHS,
+  homeJsonLd,
+  blogPostingJsonLd,
+  serializeJsonLd,
+} = require('./utils/seo');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -40,7 +48,19 @@ const seo = {
   siteName: 'BridgeDegree',
   tagline: "Nigeria's Career Infrastructure Platform",
   defaultDescription: 'Career infrastructure for Nigerian university students. Verified work experience, published research, and a Career Passport employers trust. Work Experience Engine, Publication Pipeline, Global Mobility.',
+  /** Shown in Google and other search results when a page has no custom metaDescription (~150–160 chars). */
+  searchDescription:
+    'BridgeDegree helps Nigerian undergraduates build verified internships, publishable research, and a trusted Career Passport while you earn your degree.',
   baseUrl: process.env.BASE_URL || 'https://www.bridgdegree.com',
+  defaultOgImagePath: '/images/logo.png',
+  twitterSite: process.env.TWITTER_SITE || '',
+  sameAs: process.env.SCHEMA_SAME_AS
+    ? process.env.SCHEMA_SAME_AS.split(',').map((s) => s.trim()).filter(Boolean)
+    : [],
+  founders: [
+    { name: 'Ernest Chukwuemeka', jobTitle: 'Founder' },
+    { name: 'Prince Chukwuemeka', jobTitle: 'Founder' },
+  ],
   keywords: [
     'Nigeria career platform',
     'African graduate employability',
@@ -82,7 +102,20 @@ app.use((req, res, next) => {
   res.locals.quickLinks = quickLinks;
   res.locals.currentRoute = null; // set per route
   res.locals.seo = seo;
-  res.locals.canonicalUrl = seo.baseUrl + req.path;
+  res.locals.canonicalUrl = seoCanonicalUrl(seo.baseUrl, req.path || '/');
+  res.locals.documentTitle = function documentTitle(pageTitle) {
+    const t =
+      pageTitle !== undefined && pageTitle !== null && String(pageTitle).trim() !== ''
+        ? String(pageTitle).trim()
+        : seo.siteName;
+    return `${t} | ${seo.tagline}`;
+  };
+  res.locals.ogType = 'website';
+  res.locals.ogImageUrl = toAbsoluteUrl(seo.baseUrl, seo.defaultOgImagePath);
+  res.locals.articlePublishedTime = null;
+  res.locals.articleModifiedTime = null;
+  res.locals.jsonLd = null;
+  res.locals.robotsMeta = null;
   next();
 });
 
@@ -152,6 +185,7 @@ app.get('/', async (req, res) => {
     testimonials,
     partners,
     hero,
+    jsonLd: serializeJsonLd(homeJsonLd(seo)),
   });
 });
 
@@ -271,7 +305,14 @@ app.get('/blog/:slug', async (req, res) => {
       .select('title slug createdAt image')
       .lean();
     res.locals.currentRoute = 'blog';
+    res.locals.ogType = 'article';
+    res.locals.ogImageUrl = post.image
+      ? toAbsoluteUrl(seo.baseUrl, post.image)
+      : toAbsoluteUrl(seo.baseUrl, seo.defaultOgImagePath);
+    res.locals.articlePublishedTime = post.createdAt ? new Date(post.createdAt).toISOString() : null;
+    res.locals.articleModifiedTime = post.updatedAt ? new Date(post.updatedAt).toISOString() : null;
     const plainSnippet = stripHtml(post.content || '').slice(0, 160);
+    res.locals.jsonLd = serializeJsonLd(blogPostingJsonLd(seo, post, res.locals.canonicalUrl));
     res.render('blog-single', {
       title: post.title,
       breadcrumb: [{ path: '/', label: 'Home' }, { path: '/blog', label: 'Blog' }, { label: post.title }],
@@ -320,6 +361,55 @@ app.get('/policy', (req, res) => {
     breadcrumb: [{ path: '/', label: 'Home' }, { label: 'Policy' }],
     metaDescription: 'BridgeDegree policy and terms. Nigeria career platform for students and partners.',
   });
+});
+
+app.get('/robots.txt', (req, res) => {
+  const origin = seo.baseUrl.replace(/\/$/, '');
+  const body = [
+    'User-agent: *',
+    'Disallow: /admin',
+    'Disallow: /student',
+    '',
+    `Sitemap: ${origin}/sitemap.xml`,
+  ].join('\n');
+  res.type('text/plain; charset=utf-8');
+  res.send(body);
+});
+
+app.get('/sitemap.xml', async (req, res) => {
+  function escapeXml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  try {
+    const origin = seo.baseUrl.replace(/\/$/, '');
+    const today = new Date().toISOString().split('T')[0];
+    const entries = MARKETING_PATHS.map((p) => ({
+      loc: origin + (p === '/' ? '/' : p),
+      lastmod: today,
+    }));
+    const posts = await BlogPost.find({ published: true }).select('slug updatedAt createdAt').lean();
+    for (const post of posts) {
+      const d = post.updatedAt || post.createdAt;
+      const lastmod = d ? new Date(d).toISOString().split('T')[0] : today;
+      entries.push({ loc: `${origin}/blog/${post.slug}`, lastmod });
+    }
+    const xml =
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+      entries
+        .map((e) => `  <url><loc>${escapeXml(e.loc)}</loc><lastmod>${e.lastmod}</lastmod></url>`)
+        .join('\n') +
+      '\n</urlset>\n';
+    res.type('application/xml; charset=utf-8');
+    res.send(xml);
+  } catch (err) {
+    console.error('sitemap.xml', err);
+    res.status(500).type('text/plain').send('Sitemap unavailable');
+  }
 });
 
 module.exports = app;

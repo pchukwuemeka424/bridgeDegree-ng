@@ -254,7 +254,7 @@ async function sendEmail(opts) {
 }
 
 /**
- * Notify a student they have been assigned to an internship placement (admin or roster tools).
+ * Notify a student they have been assigned to an internship placement (admin only).
  * @param {Object} application - { email, firstname, applicationId }
  * @param {Object} placement - { title, category?: { name } }
  * @returns {Promise<{ success: boolean, error?: string }>}

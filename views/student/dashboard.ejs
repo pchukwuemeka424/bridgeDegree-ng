@@ -2,27 +2,6 @@
   <h1 class="sd-page__title"><%= typeof title !== 'undefined' ? title : 'Dashboard' %></h1>
 
   <% if (typeof application !== 'undefined' && application) { %>
-  <% if (typeof placementOk !== 'undefined' && placementOk) { %>
-  <div class="sd-alert sd-alert--success">
-    <i data-lucide="check-circle"></i>
-    <span>Your placement choice has been saved. We’ll use this for your work experience record.</span>
-  </div>
-  <% } %>
-  <% if (typeof placementErr !== 'undefined' && placementErr) { %>
-  <div class="sd-alert sd-alert--error">
-    <i data-lucide="alert-circle"></i>
-    <span>
-      <% if (placementErr === 'eligible') { %>You can choose a placement once your application is <strong>shortlisted</strong> or <strong>accepted</strong>.<% } %>
-      <% if (placementErr === 'missing') { %>Please select a placement before saving.<% } %>
-      <% if (placementErr === 'invalid') { %>That choice was not valid. Please try again.<% } %>
-      <% if (placementErr === 'notfound') { %>That placement is no longer available. Pick another option.<% } %>
-      <% if (placementErr === 'inactive') { %>That placement is closed for new joins. Choose a different one.<% } %>
-      <% if (placementErr === 'server') { %>Something went wrong. Please try again in a moment.<% } %>
-      <% if (!['eligible','missing','invalid','notfound','inactive','server'].includes(placementErr)) { %>Could not update placement.<% } %>
-    </span>
-  </div>
-  <% } %>
-
   <section class="sd-section">
     <h2 class="sd-section__title">Application status</h2>
     <p class="sd-section__desc">Your current status and next steps.</p>
@@ -36,56 +15,23 @@
 
   <section class="sd-section">
     <h2 class="sd-section__title">Internship placement</h2>
-    <% if (typeof canChoosePlacement !== 'undefined' && canChoosePlacement) { %>
-    <p class="sd-section__desc">Choose an open placement to join. You can change your selection anytime while you remain shortlisted or accepted.</p>
+    <p class="sd-section__desc">Your internship is assigned by the BridgeDegree team. You cannot select or change it yourself here.</p>
     <div class="sd-section__body">
       <% if (application.internship && (application.internship.title || application.internship._id)) { %>
       <div class="sd-placement-current">
-        <span class="sd-placement-current__label">Current choice</span>
+        <span class="sd-placement-current__label">Your placement</span>
         <strong class="sd-placement-current__title"><%= application.internship.title || 'Placement' %></strong>
         <% if (application.internship.category && application.internship.category.name) { %>
         <span class="sd-placement-current__meta"><%= application.internship.category.name %></span>
         <% } %>
+        <% if (application.internship.description && String(application.internship.description).trim()) { %>
+        <p class="sd-placement-readonly-desc"><%= application.internship.description.length > 400 ? application.internship.description.slice(0, 400).trim() + '…' : application.internship.description %></p>
+        <% } %>
       </div>
-      <% } %>
-      <% var curId = application.internship ? String(application.internship._id || application.internship) : ''; %>
-      <% if (typeof placementGroups !== 'undefined' && placementGroups && placementGroups.length) { %>
-      <form method="post" action="/student/dashboard/placement" class="sd-form sd-placement-form">
-        <input type="hidden" name="email" value="<%= application.email %>">
-        <input type="hidden" name="applicationId" value="<%= application.applicationId %>">
-        <fieldset class="sd-placement-fieldset">
-          <legend class="sd-field__label">Available placements by category</legend>
-          <% placementGroups.forEach(function(group) { %>
-          <div class="sd-placement-group">
-            <h3 class="sd-placement-group__title"><%= group.categoryName %></h3>
-            <div class="sd-placement-list">
-              <% group.placements.forEach(function(p) { %>
-              <label class="sd-placement-option">
-                <input type="radio" name="internshipId" value="<%= p._id %>" class="sd-placement-option__input" <%= curId === String(p._id) ? 'checked' : '' %> required>
-                <span class="sd-placement-option__body">
-                  <span class="sd-placement-option__title"><%= p.title %></span>
-                  <% if (p.description && String(p.description).trim()) { %>
-                  <span class="sd-placement-option__desc"><%= p.description.length > 220 ? p.description.slice(0, 220).trim() + '…' : p.description %></span>
-                  <% } %>
-                </span>
-              </label>
-              <% }); %>
-            </div>
-          </div>
-          <% }); %>
-        </fieldset>
-        <button type="submit" class="sd-btn sd-btn--primary">
-          <i data-lucide="briefcase"></i>
-          <%= (application.internship && curId) ? 'Update placement' : 'Join this placement' %>
-        </button>
-      </form>
       <% } else { %>
-      <p class="sd-section__desc sd-placement-empty">There are no open placements right now. Placements are created in <strong>Admin → Internships</strong> (not only categories). If this is a new environment, run <code>npm run seed</code> once to add sample placements—then restart the app.</p>
+      <p class="sd-section__desc sd-placement-empty">You are not on an internship placement yet. When your application is ready, an administrator will assign you—watch your email for updates.</p>
       <% } %>
     </div>
-    <% } else { %>
-    <p class="sd-section__desc">When your application is <strong>shortlisted</strong> or <strong>accepted</strong>, you’ll be able to choose an internship placement from this page.</p>
-    <% } %>
   </section>
 
   <section class="sd-section">
